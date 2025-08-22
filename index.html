@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus - Sistema Operativo Gamer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #e2e8f0;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --rgb-red: #ff006e;
+      --rgb-green: #00ff88;
+      --rgb-blue: #00d9ff;
+      --neon-purple: #bf00ff;
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff0080;
+      --neon-yellow: #ffeb3b;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--light);
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -2;
+    }
+    
+    /* RGB particles background */
+    .rgb-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: float 20s infinite linear;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .glass-light {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes slideInUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        transform: translateX(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes rgbPulse {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes borderGlow {
+      0% { border-color: var(--primary); }
+      25% { border-color: var(--secondary); }
+      50% { border-color: var(--accent); }
+      75% { border-color: var(--rgb-blue); }
+      100% { border-color: var(--primary); }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-slide-in-up {
+      animation: slideInUp 0.6s ease-out;
+    }
+    
+    .animate-slide-in-left {
+      animation: slideInLeft 0.6s ease-out;
+    }
+    
+    .animate-slide-in-right {
+      animation: slideInRight 0.6s ease-out;
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    .animate-rgb {
+      animation: rgbPulse 3s linear infinite;
+    }
+    
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .animate-rotate {
+      animation: rotate 20s linear infinite;
+    }
+    
+    .animate-zoom-in {
+      animation: zoomIn 0.5s ease-out;
+    }
+    
+    .animate-border-glow {
+      animation: borderGlow 3s linear infinite;
+    }
+    
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .logo-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .nav-menu {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: var(--light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.3s ease;
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary);
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    
+    .download-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5);
+    }
+    
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 6rem 2rem 2rem;
+    }
+    
+    .hero-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    
+    .hero-text h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent), var(--rgb-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbPulse 5s linear infinite;
+    }
+    
+    .hero-text p {
+      font-size: 1.25rem;
+      color: var(--gray);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5);
+    }
+    
+    .btn-secondary {
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .hero-mockup {
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 20px;
+      border: 2px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .mockup-header {
+      height: 60px;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+    }
+    
+    .mockup-logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+    
+    .mockup-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      color: var(--light);
+    }
+    
+    .mockup-content {
+      height: calc(100% - 60px);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 1.5rem;
+    }
+    
+    .mockup-app {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .mockup-app:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .mockup-app-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      background: rgba(99, 102, 241, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--primary);
+    }
+    
+    .mockup-app-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--light);
+      text-align: center;
+    }
+    
+    /* Features Section */
+    .features {
+      padding: 6rem 2rem;
+      background: rgba(15, 23, 42, 0.3);
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 4rem;
+    }
+    
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .section-subtitle {
+      font-size: 1.25rem;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      animation: borderGlow 3s linear infinite;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 1rem;
+    }
+    
+    .feature-description {
+      color: var(--gray);
+      line-height: 1.6;
+    }
+    
+    /* Apps Section */
+    .apps {
+      padding: 6rem 2rem;
+    }
+    
+    .apps-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    
+    .app-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .app-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+    }
+    
+    .app-header {
+      height: 120px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .app-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+    
+    .app-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: var(--primary);
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .app-body {
+      padding: 2rem;
+    }
+    
+    .app-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    
+    .app-description {
+      color: var(--gray);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    
+    .app-features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+    
+    .app-feature {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      color: var(--light);
+    }
+    
+    .app-feature i {
+      color: var(--primary);
+      font-size: 0.875rem;
+    }
+    
+    .app-link {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .app-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    /* About Section */
+    .about {
+      padding: 6rem 2rem;
+      background: rgba(15, 23, 42, 0.3);
+    }
+    
+    .about-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    
+    .about-text h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .about-text p {
+      font-size: 1.125rem;
+      color: var(--gray);
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+    }
+    
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .stat-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 15px;
+      padding: 1.5rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .about-image {
+      position: relative;
+    }
+    
+    .about-image img {
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Footer */
+    .footer {
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 3rem 2rem 2rem;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .footer-brand {
+      max-width: 600px;
+    }
+    
+    .footer-brand h3 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .footer-brand p {
+      color: var(--gray);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 3rem auto 0;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+      text-align: center;
+      color: var(--gray);
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal-content {
+      background: rgba(15, 23, 42, 0.9);
+      margin: 10% auto;
+      padding: 2rem;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideInUp 0.4s ease;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--light);
+    }
+    
+    .close {
+      color: var(--gray);
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    
+    .close:hover {
+      color: var(--danger);
+    }
+    
+    .version-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .version-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .version-option:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .version-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .version-name {
+      font-weight: 600;
+      color: var(--light);
+    }
+    
+    .version-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    
+    .version-normal .version-icon {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+    }
+    
+    .version-red .version-icon {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+    }
+    
+    .version-green .version-icon {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+    
+    .help-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .help-icon:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .tooltip {
+      position: relative;
+    }
+    
+    .tooltip-text {
+      visibility: hidden;
+      width: 250px;
+      background-color: rgba(15, 23, 42, 0.95);
+      color: var(--light);
+      text-align: center;
+      border-radius: 10px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -125px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-size: 14px;
+    }
+    
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(99, 102, 241, 0.3) transparent transparent transparent;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .hero-buttons {
+        justify-content: center;
+      }
+      
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-content {
+        flex-direction: column;
+        gap: 2rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+      
+      .hero-text h1 {
+        font-size: 3rem;
+      }
+      
+      .section-title {
+        font-size: 2rem;
+      }
+      
+      .features-grid,
+      .apps-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .about-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- RGB Particles Background -->
+  <div class="rgb-particles" id="particles"></div>
+  
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-rocket"></i>
+        </div>
+        <div class="logo-text">NEXUS</div>
+      </div>
+      
+      <nav class="nav-menu">
+        <a href="#home" class="nav-link">Início</a>
+        <a href="#features" class="nav-link">Recursos</a>
+        <a href="#apps" class="nav-link">Aplicativos</a>
+        <a href="#about" class="nav-link">Sobre</a>
+        <a href="#download" class="download-btn">
+          <i class="fas fa-download"></i>
+          Baixar
+        </a>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <div class="hero-text animate-slide-in-left">
+        <h1>Sistema Operativo<br>Gamer do Futuro</h1>
+        <p>O Nexus é uma revolução na experiência digital, combinando o poder de um sistema operativo completo com a estética vibrante do universo gaming. Prepare-se para uma jornada visual e funcional como nenhuma outra.</p>
+        <div class="hero-buttons">
+          <a href="projetos.html" class="btn-primary animate-zoom-in">
+            <i class="fas fa-rocket"></i>
+            Explorar Aplicativos
+          </a>
+        </div>
+      </div>
+      
+      <div class="hero-visual animate-slide-in-right">
+        <div class="hero-mockup">
+          <div class="mockup-header">
+            <div class="mockup-logo">
+              <i class="fas fa-rocket"></i>
+            </div>
+            <div class="mockup-title">NEXUS OS</div>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-images"></i>
+              </div>
+              <div class="mockup-app-name">Galeria</div>
+            </div>
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-calculator"></i>
+              </div>
+              <div class="mockup-app-name">Calculadora</div>
+            </div>
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="mockup-app-name">Relógio</div>
+            </div>
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-folder-open"></i>
+              </div>
+              <div class="mockup-app-name">Explorer</div>
+            </div>
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-sticky-note"></i>
+              </div>
+              <div class="mockup-app-name">Notepad</div>
+            </div>
+            <div class="mockup-app">
+              <div class="mockup-app-icon">
+                <i class="fas fa-paint-brush"></i>
+              </div>
+              <div class="mockup-app-name">Paint</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="section-header animate-fade-in">
+      <h2 class="section-title">Recursos Incríveis</h2>
+      <p class="section-subtitle">O Nexus combina tecnologia de ponta com design deslumbrante para criar uma experiência única</p>
+    </div>
+    
+    <div class="features-grid">
+      <div class="feature-card animate-slide-in-up">
+        <div class="feature-icon animate-glow">
+          <i class="fas fa-palette"></i>
+        </div>
+        <h3 class="feature-title">Design Material Gamer</h3>
+        <p class="feature-description">Uma identidade visual única que combina elementos neon, gradientes animados e efeitos de glassmorphism para uma experiência imersiva.</p>
+      </div>
+      
+      <div class="feature-card animate-slide-in-up" style="animation-delay: 0.1s">
+        <div class="feature-icon animate-glow" style="animation-delay: 0.1s">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3 class="feature-title">Performance Extrema</h3>
+        <p class="feature-description">Otimizado para oferecer o máximo de desempenho, mesmo em sistemas modestos, garantindo uma experiência fluida.</p>
+      </div>
+      
+      <div class="feature-card animate-slide-in-up" style="animation-delay: 0.2s">
+        <div class="feature-icon animate-glow" style="animation-delay: 0.2s">
+          <i class="fas fa-magic"></i>
+        </div>
+        <h3 class="feature-title">Animações Fluidas</h3>
+        <p class="feature-description">Transições suaves e micro-interações que tornam cada interação uma experiência prazerosa e responsiva.</p>
+      </div>
+      
+      <div class="feature-card animate-slide-in-up" style="animation-delay: 0.3s">
+        <div class="feature-icon animate-glow" style="animation-delay: 0.3s">
+          <i class="fas fa-mobile-alt"></i>
+        </div>
+        <h3 class="feature-title">Totalmente Responsivo</h3>
+        <p class="feature-description">Adapta-se perfeitamente a qualquer dispositivo, desde desktops até smartphones, mantendo a mesma qualidade visual.</p>
+      </div>
+      
+      <div class="feature-card animate-slide-in-up" style="animation-delay: 0.4s">
+        <div class="feature-icon animate-glow" style="animation-delay: 0.4s">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3 class="feature-title">Segurança Avançada</h3>
+        <p class="feature-description">Proteção integrada com criptografia de dados e controles de segurança robustos para manter suas informações seguras.</p>
+      </div>
+      
+      <div class="feature-card animate-slide-in-up" style="animation-delay: 0.5s">
+        <div class="feature-icon animate-glow" style="animation-delay: 0.5s">
+          <i class="fas fa-infinity"></i>
+        </div>
+        <h3 class="feature-title">Personalização Infinita</h3>
+        <p class="feature-description">Customize cada aspecto do sistema com temas, cores e animações para criar sua experiência única.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Apps Section -->
+  <section id="apps" class="apps">
+    <div class="section-header animate-fade-in">
+      <h2 class="section-title">Aplicativos Nexus</h2>
+      <p class="section-subtitle">Conheça os aplicativos que compõem o ecossistema Nexus</p>
+    </div>
+    
+    <div class="apps-grid">
+      <div class="app-card animate-zoom-in">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-images"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Gallery</h3>
+          <p class="app-description">Gerencie suas fotos e vídeos com estilo</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Visualização em grade e lista</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Filtros e edição básica</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Organização por datas</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="gallery">Ver Aplicativo</a>
+        </div>
+      </div>
+      
+      <div class="app-card animate-zoom-in" style="animation-delay: 0.1s">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-calculator"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Calculator</h3>
+          <p class="app-description">Cálculos precisos com design futurista</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Operações básicas e avançadas</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Histórico de cálculos</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Conversor de unidades</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="calculator">Ver Aplicativo</a>
+        </div>
+      </div>
+      
+      <div class="app-card animate-zoom-in" style="animation-delay: 0.2s">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Clock</h3>
+          <p class="app-description">Tempo com estilo e funcionalidade</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Relógio analógico e digital</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Múltiplos alarmes</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Relógio mundial</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="clock">Ver Aplicativo</a>
+        </div>
+      </div>
+      
+      <div class="app-card animate-zoom-in" style="animation-delay: 0.3s">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-folder-open"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Explorer</h3>
+          <p class="app-description">Navegue pelos seus arquivos com elegância</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Visualização em múltiplos modos</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Busca rápida e avançada</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Gestão de favoritos</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="explorer">Ver Aplicativo</a>
+        </div>
+      </div>
+      
+      <div class="app-card animate-zoom-in" style="animation-delay: 0.4s">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-sticky-note"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Notepad</h3>
+          <p class="app-description">Anotações com toques de futurismo</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Sintaxe colorida</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Múltiplos temas</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Auto salvamento</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="notepad">Ver Aplicativo</a>
+        </div>
+      </div>
+      
+      <div class="app-card animate-zoom-in" style="animation-delay: 0.5s">
+        <div class="app-header">
+          <div class="app-icon">
+            <i class="fas fa-paint-brush"></i>
+          </div>
+        </div>
+        <div class="app-body">
+          <h3 class="app-name">Nexus Paint</h3>
+          <p class="app-description">Crie arte com ferramentas modernas</p>
+          <ul class="app-features">
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Múltiplas ferramentas de desenho</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Camadas e efeitos</span>
+            </li>
+            <li class="app-feature">
+              <i class="fas fa-check"></i>
+              <span>Exportação em diversos formatos</span>
+            </li>
+          </ul>
+          <a href="#" class="app-link" data-app="paint">Ver Aplicativo</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- About Section -->
+  <section id="about" class="about">
+    <div class="section-header animate-fade-in">
+      <h2 class="section-title">Sobre o Nexus</h2>
+      <p class="section-subtitle">Conheça a história e a visão por trás do sistema operativo gamer do futuro</p>
+    </div>
+    
+    <div class="about-content">
+      <div class="about-text animate-slide-in-left">
+        <h2>O Futuro é Agora</h2>
+        <p>O Nexus nasceu da necessidade de criar uma experiência digital que combinasse o poder de um sistema operativo completo com a estética vibrante e imersiva do universo gaming. Acreditamos que a tecnologia não deve ser apenas funcional, mas também emocionante e visualmente impactante.</p>
+        <p>Cada elemento do Nexus foi cuidadosamente projetado para oferecer não apenas funcionalidade, mas também uma experiência sensorial única. Desde os gradientes animados até as micro-interações, tudo foi pensado para criar uma conexão emocional entre o usuário e o sistema.</p>
+        <p>Com uma arquitetura moderna e otimizada, o Nexus oferece desempenho excepcional mesmo em hardware modesto, garantindo que todos possam experimentar o futuro da computação.</p>
+        
+        <div class="about-stats">
+          <div class="stat-card animate-zoom-in">
+            <div class="stat-number" data-count="6">6</div>
+            <div class="stat-label">Aplicativos</div>
+          </div>
+          <div class="stat-card animate-zoom-in" style="animation-delay: 0.1s">
+            <div class="stat-number" data-count="100">100</div>
+            <div class="stat-label">% Web Based</div>
+          </div>
+          <div class="stat-card animate-zoom-in" style="animation-delay: 0.2s">
+            <div class="stat-number" data-count="24">60</div>
+            <div class="stat-label">Horas de Desenvolvimento</div>
+          </div>
+          <div class="stat-card animate-zoom-in" style="animation-delay: 0.3s">
+            <div class="stat-number" data-count="1">100%</div>
+            <div class="stat-label">Visão Revolucionária</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="about-image animate-slide-in-right">
+        <img src="logo.png" alt="Nexus System">
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>NEXUS</h3>
+        <p>O sistema operativo gamer que está redefinindo a experiência digital. Junte-se à revolução e experimente o futuro hoje mesmo.</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2023 Nexus. Todos os direitos reservados. Feito com <i class="fas fa-heart" style="color: var(--danger);"></i> para a comunidade gamer.</p>
+    </div>
+  </footer>
+  
+  <!-- Version Selection Modal -->
+  <div id="versionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Selecione a Versão</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="version-options">
+        <div class="version-option version-normal" data-version="normal">
+          <div class="version-info">
+            <div class="version-icon">
+              <i class="fas fa-cube"></i>
+            </div>
+            <div class="version-name">Versão Normal</div>
+          </div>
+        </div>
+        <div class="version-option version-red" data-version="red">
+          <div class="version-info">
+            <div class="version-icon">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div class="version-name">Versão Red</div>
+          </div>
+          <div class="tooltip">
+            <div class="help-icon">?</div>
+            <span class="tooltip-text">Versão com tema vermelho, otimizada para desempenho em jogos</span>
+          </div>
+        </div>
+        <div class="version-option version-green" data-version="green">
+          <div class="version-info">
+            <div class="version-icon">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <div class="version-name">Versão Green</div>
+          </div>
+          <div class="tooltip">
+            <div class="help-icon">?</div>
+            <span class="tooltip-text">Versão com tema verde, focada em economia de energia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Create RGB particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const colors = ['#ff006e', '#00ff88', '#00d9ff', '#bf00ff', '#ff0080'];
+      
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Animate counter numbers
+    function animateCounters() {
+      const counters = document.querySelectorAll('.stat-number');
+      
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-count'));
+        const increment = target / 100;
+        let current = 0;
+        
+        const updateCounter = () => {
+          current += increment;
+          if (current < target) {
+            counter.textContent = Math.ceil(current);
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target;
+          }
+        };
+        
+        updateCounter();
+      });
+    }
+    
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          
+          if (entry.target.classList.contains('about-stats')) {
+            animateCounters();
+          }
+        }
+      });
+    }, observerOptions);
+    
+    // Modal functionality
+    const modal = document.getElementById('versionModal');
+    const closeBtn = document.querySelector('.close');
+    let currentApp = '';
+    
+    // Open modal when app link is clicked
+    document.querySelectorAll('.app-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        currentApp = this.getAttribute('data-app');
+        modal.style.display = 'block';
+      });
+    });
+    
+    // Close modal when close button is clicked
+    closeBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Handle version selection
+    document.querySelectorAll('.version-option').forEach(option => {
+      option.addEventListener('click', function() {
+        const version = this.getAttribute('data-version');
+        let url = '';
+        
+        // Build URL based on app and version
+        if (version === 'normal') {
+          url = `nexus${currentApp}.html`;
+        } else if (version === 'red') {
+          url = `nexus${currentApp}red.html`;
+        } else if (version === 'green') {
+          url = `nexus${currentApp}green.html`;
+        }
+        
+        // Redirect to the selected version
+        window.location.href = url;
+      });
+    });
+    
+    // Observe elements
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      
+      // Observe animated elements
+      const animatedElements = document.querySelectorAll('.feature-card, .app-card, .stat-card');
+      animatedElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
+      
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        });
+      });
+      
+      // Header scroll effect
+      let lastScroll = 0;
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        const header = document.querySelector('.header');
+        
+        if (currentScroll > 100) {
+          header.style.background = 'rgba(15, 23, 42, 0.95)';
+          header.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+        } else {
+          header.style.background = 'rgba(15, 23, 42, 0.8)';
+          header.style.boxShadow = 'none';
+        }
+        
+        lastScroll = currentScroll;
+      });
+    });
+  </script>
+</body>
+</html>

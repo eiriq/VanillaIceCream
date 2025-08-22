@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus Clock - Relógio Gamer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #e2e8f0;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --rgb-red: #ff006e;
+      --rgb-green: #00ff88;
+      --rgb-blue: #00d9ff;
+      --neon-purple: #bf00ff;
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff0080;
+      
+      /* Clock specific colors */
+      --clock-bg: rgba(15, 23, 42, 0.7);
+      --clock-border: rgba(99, 102, 241, 0.3);
+      --clock-hand: var(--primary);
+      --clock-second: var(--danger);
+      --clock-number: var(--light);
+      --clock-center: var(--primary);
+      --digital-time: var(--light);
+      --alarm-bg: rgba(15, 23, 42, 0.7);
+      --alarm-border: rgba(99, 102, 241, 0.3);
+      --alarm-active: var(--primary);
+      --timer-bg: rgba(15, 23, 42, 0.7);
+      --timer-border: rgba(99, 102, 241, 0.3);
+      --world-clock-bg: rgba(15, 23, 42, 0.7);
+      --world-clock-border: rgba(99, 102, 241, 0.3);
+      --map-bg: rgba(15, 23, 42, 0.5);
+      --map-border: rgba(99, 102, 241, 0.3);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .glass-light {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes rgbPulse {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .animate-rgb {
+      animation: rgbPulse 3s linear infinite;
+    }
+    
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .animate-rotate {
+      animation: rotate 20s linear infinite;
+    }
+    
+    .animate-zoom-in {
+      animation: zoomIn 0.3s ease-out;
+    }
+    
+    /* Main container */
+    .app-container {
+      width: 100%;
+      height: 100vh;
+      background: rgba(2, 2, 23, 0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: 0;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .app-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .system-time {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .current-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .current-date {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    /* App Content */
+    .app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background: rgba(15, 23, 42, 0.5);
+      border-right: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      gap: 20px;
+      overflow-y: auto;
+    }
+    
+    .sidebar-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 22px;
+      position: relative;
+    }
+    
+    .sidebar-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      transform: translateY(-3px);
+    }
+    
+    .sidebar-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+    
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Content panels */
+    .content-panel {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 24px;
+    }
+    
+    .content-panel.active {
+      display: flex;
+    }
+    
+    /* Clock Section */
+    .clock-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    
+    .analog-clock {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: var(--clock-bg);
+      border: 8px solid var(--clock-border);
+      position: relative;
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+      margin-bottom: 40px;
+    }
+    
+    .clock-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+    
+    .hand {
+      position: absolute;
+      left: 50%;
+      bottom: 50%;
+      transform-origin: 50% 100%;
+      border-radius: 4px;
+    }
+    
+    .hour-hand {
+      width: 6px;
+      height: 80px;
+      background: var(--clock-hand);
+    }
+    
+    .minute-hand {
+      width: 4px;
+      height: 110px;
+      background: var(--clock-hand);
+    }
+    
+    .second-hand {
+      width: 2px;
+      height: 120px;
+      background: var(--clock-second);
+    }
+    
+    .center-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--clock-center);
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+    }
+    
+    .clock-number {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--clock-number);
+      font-family: 'Orbitron', monospace;
+    }
+    
+    .digital-time {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .time-display {
+      font-family: 'Orbitron', monospace;
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--digital-time);
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .date-display {
+      font-size: 20px;
+      color: var(--gray);
+    }
+    
+    /* Alarm Section */
+    .alarm-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    
+    .action-btn:hover {
+      background: rgba(99, 102, 241, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+    }
+    
+    .alarms-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .alarm-card {
+      background: var(--alarm-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid var(--alarm-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .alarm-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+    }
+    
+    .alarm-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--light);
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .alarm-label {
+      font-size: 18px;
+      color: var(--gray);
+      margin-bottom: 16px;
+    }
+    
+    .alarm-days {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    
+    .alarm-day {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .alarm-day.active {
+      background: var(--alarm-active);
+      color: white;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+    }
+    
+    .alarm-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .alarm-action-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--light);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .alarm-action-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+    }
+    
+    .alarm-action-btn.delete {
+      color: var(--danger);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .alarm-action-btn.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    
+    /* Toggle switch */
+    .alarm-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 24px;
+      background: rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .alarm-toggle.active {
+      background: var(--alarm-active);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+    }
+    
+    .toggle-circle {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .alarm-toggle.active .toggle-circle {
+      transform: translateX(24px);
+    }
+    
+    /* Timer Section */
+    .timer-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    
+    .timer-display {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .timer-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--light);
+      margin-bottom: 10px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    .timer-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .timer-btn:hover {
+      background: rgba(99, 102, 241, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .timer-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    .timer-btn.primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6);
+    }
+    
+    .timer-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    
+    .timer-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .timer-input {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      font-size: 36px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+      outline: none;
+      font-family: 'Orbitron', monospace;
+    }
+    
+    .timer-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    }
+    
+    .timer-label {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    /* World Clock Section */
+    .world-clock-section {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .world-map {
+      background: var(--map-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--map-border);
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .map-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .map-container {
+      position: relative;
+      height: 220px;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Equirectangular_projection_SW.jpg/800px-Equirectangular_projection_SW.jpg') center/cover;
+      border-radius: 8px;
+    }
+    
+    .map-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--danger);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+      animation: pulse 2s infinite;
+    }
+    
+    .map-marker.brazil {
+      top: 65%;
+      left: 35%;
+    }
+    
+    .map-marker.usa {
+      top: 40%;
+      left: 20%;
+    }
+    
+    .map-marker.japan {
+      top: 40%;
+      left: 80%;
+    }
+    
+    .map-marker.korea {
+      top: 42%;
+      left: 78%;
+    }
+    
+    .map-marker.portugal {
+      top: 38%;
+      left: 48%;
+    }
+    
+    .world-clocks {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .world-clock-card {
+      background: var(--world-clock-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--world-clock-border);
+      transition: all 0.3s ease;
+    }
+    
+    .world-clock-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+    }
+    
+    .world-clock-card.primary {
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .world-clock-city {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .world-clock-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 32px;
+      font-weight: 300;
+      color: var(--light);
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    
+    .world-clock-date {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    /* Add alarm dialog */
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .dialog-overlay.active {
+      display: flex;
+    }
+    
+    .dialog {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      width: 500px;
+      max-width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .dialog-header {
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .dialog-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--light);
+    }
+    
+    .dialog-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 18px;
+    }
+    
+    .dialog-close:hover {
+      background: rgba(239, 68, 68, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .dialog-body {
+      padding: 24px;
+    }
+    
+    .dialog-form-group {
+      margin-bottom: 20px;
+    }
+    
+    .dialog-label {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 10px;
+    }
+    
+    .dialog-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      font-size: 16px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    
+    .dialog-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .time-input-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .time-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      font-size: 24px;
+      text-align: center;
+      outline: none;
+      font-family: 'Orbitron', monospace;
+    }
+    
+    .time-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .days-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .day-selector {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .day-selector:hover {
+      background: rgba(99, 102, 241, 0.2);
+    }
+    
+    .day-selector.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    }
+    
+    .tag-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .tag-option {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .tag-option:hover {
+      background: rgba(99, 102, 241, 0.2);
+    }
+    
+    .tag-option.selected {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+    }
+    
+    .dialog-footer {
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.8);
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    .dialog-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .dialog-btn-secondary {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+    }
+    
+    .dialog-btn-secondary:hover {
+      background: rgba(99, 102, 241, 0.3);
+    }
+    
+    .dialog-btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .dialog-btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 350px;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 2000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .notification-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 6px;
+    }
+    
+    .notification-message {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    .notification-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 16px;
+    }
+    
+    .notification-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      transform: scale(1.1);
+    }
+    
+    /* Audio player for alarm */
+    .audio-player {
+      display: none;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+      }
+      
+      .sidebar-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      
+      .analog-clock {
+        width: 250px;
+        height: 250px;
+      }
+      
+      .hour-hand {
+        height: 70px;
+      }
+      
+      .minute-hand {
+        height: 90px;
+      }
+      
+      .second-hand {
+        height: 100px;
+      }
+      
+      .time-display {
+        font-size: 56px;
+      }
+      
+      .timer-time {
+        font-size: 56px;
+      }
+      
+      .alarms-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .world-clocks {
+        grid-template-columns: 1fr;
+      }
+      
+      .dialog {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon animate-glow">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="app-title">NEXUS CLOCK</div>
+      </div>
+      
+      <div class="system-time">
+        <div class="current-time" id="headerTime">00:00:00</div>
+        <div class="current-date" id="headerDate">Carregando...</div>
+      </div>
+    </header>
+    
+    <!-- App Content -->
+    <div class="app-content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="sidebar-btn active" title="Relógio" data-section="clock">
+          <i class="fas fa-clock"></i>
+        </button>
+        <button class="sidebar-btn" title="Alarme" data-section="alarm">
+          <i class="fas fa-bell"></i>
+        </button>
+        <button class="sidebar-btn" title="Temporizador" data-section="timer">
+          <i class="fas fa-hourglass-half"></i>
+        </button>
+        <button class="sidebar-btn" title="Relógio Mundial" data-section="world-clock">
+          <i class="fas fa-globe"></i>
+        </button>
+        
+        <div class="sidebar-btn" title="Modo Gamer" style="margin-top: auto; background: linear-gradient(135deg, var(--danger), var(--warning));">
+          <i class="fas fa-gamepad"></i>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Clock Panel -->
+        <div class="content-panel active" id="clock-panel">
+          <div class="clock-section">
+            <div class="analog-clock">
+              <div class="clock-face">
+                <!-- Clock numbers -->
+                <div class="clock-number" style="top: 5px; left: 50%; transform: translateX(-50%);">12</div>
+                <div class="clock-number" style="top: 50%; right: 5px; transform: translateY(-50%);">3</div>
+                <div class="clock-number" style="bottom: 5px; left: 50%; transform: translateX(-50%);">6</div>
+                <div class="clock-number" style="top: 50%; left: 5px; transform: translateY(-50%);">9</div>
+                
+                <!-- Clock hands -->
+                <div class="hand hour-hand" id="hourHand"></div>
+                <div class="hand minute-hand" id="minuteHand"></div>
+                <div class="hand second-hand" id="secondHand"></div>
+                <div class="center-dot"></div>
+              </div>
+            </div>
+            
+            <div class="digital-time">
+              <div class="time-display" id="digitalTime">00:00:00</div>
+              <div class="date-display" id="dateDisplay">Carregando...</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Alarm Panel -->
+        <div class="content-panel" id="alarm-panel">
+          <div class="alarm-section">
+            <div class="section-header">
+              <h2 class="section-title">Alarmes</h2>
+              <button class="action-btn primary" id="addAlarmBtn">
+                <i class="fas fa-plus"></i>
+                <span>Adicionar Alarme</span>
+              </button>
+            </div>
+            
+            <div class="alarms-container" id="alarmsList">
+              <!-- Alarm cards will be added here dynamically -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Timer Panel -->
+        <div class="content-panel" id="timer-panel">
+          <div class="timer-section">
+            <div class="timer-display">
+              <div class="timer-time" id="timerTime">00:00:00</div>
+            </div>
+            
+            <div class="timer-inputs">
+              <div class="timer-input-group">
+                <input type="number" class="timer-input" id="timerHours" min="0" max="23" value="0">
+                <div class="timer-label">Horas</div>
+              </div>
+              <div class="timer-input-group">
+                <input type="number" class="timer-input" id="timerMinutes" min="0" max="59" value="0">
+                <div class="timer-label">Minutos</div>
+              </div>
+              <div class="timer-input-group">
+                <input type="number" class="timer-input" id="timerSeconds" min="0" max="59" value="0">
+                <div class="timer-label">Segundos</div>
+              </div>
+            </div>
+            
+            <div class="timer-controls">
+              <button class="timer-btn" id="timerResetBtn">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="timer-btn primary" id="timerStartBtn">
+                <i class="fas fa-play"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- World Clock Panel -->
+        <div class="content-panel" id="world-clock-panel">
+          <div class="world-clock-section">
+            <div class="world-map">
+              <div class="map-title">Mapa Mundial</div>
+              <div class="map-container">
+                <div class="map-marker brazil"></div>
+                <div class="map-marker usa"></div>
+                <div class="map-marker japan"></div>
+                <div class="map-marker korea"></div>
+                <div class="map-marker portugal"></div>
+              </div>
+            </div>
+            
+            <div class="world-clocks" id="worldClocks">
+              <div class="world-clock-card primary">
+                <div class="world-clock-city">
+                  <i class="fas fa-flag" style="color: #009c3b;"></i>
+                  Brasil
+                </div>
+                <div class="world-clock-time" id="brazilTime">00:00</div>
+                <div class="world-clock-date" id="brazilDate">Carregando...</div>
+              </div>
+              
+              <div class="world-clock-card">
+                <div class="world-clock-city">
+                  <i class="fas fa-flag" style="color: #3c3b6e;"></i>
+                  EUA
+                </div>
+                <div class="world-clock-time" id="usaTime">00:00</div>
+                <div class="world-clock-date" id="usaDate">Carregando...</div>
+              </div>
+              
+              <div class="world-clock-card">
+                <div class="world-clock-city">
+                  <i class="fas fa-flag" style="color: #bc002d;"></i>
+                  Japão
+                </div>
+                <div class="world-clock-time" id="japanTime">00:00</div>
+                <div class="world-clock-date" id="japanDate">Carregando...</div>
+              </div>
+              
+              <div class="world-clock-card">
+                <div class="world-clock-city">
+                  <i class="fas fa-flag" style="color: #003478;"></i>
+                  Coreia do Sul
+                </div>
+                <div class="world-clock-time" id="koreaTime">00:00</div>
+                <div class="world-clock-date" id="koreaDate">Carregando...</div>
+              </div>
+              
+              <div class="world-clock-card">
+                <div class="world-clock-city">
+                  <i class="fas fa-flag" style="color: #006600;"></i>
+                  Portugal
+                </div>
+                <div class="world-clock-time" id="portugalTime">00:00</div>
+                <div class="world-clock-date" id="portugalDate">Carregando...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Alarm Dialog -->
+  <div class="dialog-overlay" id="alarmDialogOverlay">
+    <div class="dialog">
+      <div class="dialog-header">
+        <div class="dialog-title">Adicionar Alarme</div>
+        <button class="dialog-close" id="closeAlarmDialog">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="dialog-body">
+        <div class="dialog-form-group">
+          <label class="dialog-label" for="alarmName">Nome do alarme</label>
+          <input type="text" class="dialog-input" id="alarmName" placeholder="Alarme">
+        </div>
+        
+        <div class="dialog-form-group">
+          <label class="dialog-label">Horário</label>
+          <div class="time-input-group">
+            <input type="number" class="time-input" id="alarmHours" min="0" max="23" value="7">
+            <span style="color: var(--light); font-size: 24px;">:</span>
+            <input type="number" class="time-input" id="alarmMinutes" min="0" max="59" value="0">
+          </div>
+        </div>
+        
+        <div class="dialog-form-group">
+          <label class="dialog-label">Repetir</label>
+          <div class="days-selector">
+            <div class="day-selector" data-day="1">Seg</div>
+            <div class="day-selector" data-day="2">Ter</div>
+            <div class="day-selector" data-day="3">Qua</div>
+            <div class="day-selector" data-day="4">Qui</div>
+            <div class="day-selector" data-day="5">Sex</div>
+            <div class="day-selector" data-day="6">Sáb</div>
+            <div class="day-selector" data-day="0">Dom</div>
+          </div>
+        </div>
+        
+        <div class="dialog-form-group">
+          <label class="dialog-label">Etiqueta</label>
+          <div class="tag-selector">
+            <div class="tag-option" data-color="#ef4444">Vermelho</div>
+            <div class="tag-option" data-color="#f59e0b">Amarelo</div>
+            <div class="tag-option" data-color="#10b981">Verde</div>
+            <div class="tag-option" data-color="#3b82f6">Azul</div>
+            <div class="tag-option" data-color="#8b5cf6">Roxo</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dialog-footer">
+        <button class="dialog-btn dialog-btn-secondary" id="cancelAlarmBtn">Cancelar</button>
+        <button class="dialog-btn dialog-btn-primary" id="saveAlarmBtn">Salvar</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <div class="notification-icon">
+      <i class="fas fa-bell"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title" id="notificationTitle">Alarme</div>
+      <div class="notification-message" id="notificationMessage">O alarme está tocando</div>
+    </div>
+    <button class="notification-close" id="notificationClose">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  
+  <!-- Audio player for alarm -->
+  <audio id="alarmSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE" type="audio/wav">
+  </audio>
+  
+  <script>
+    // Sidebar navigation
+    const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+    const contentPanels = {
+      'clock': document.getElementById('clock-panel'),
+      'alarm': document.getElementById('alarm-panel'),
+      'timer': document.getElementById('timer-panel'),
+      'world-clock': document.getElementById('world-clock-panel')
+    };
+    
+    sidebarBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const section = this.getAttribute('data-section');
+        if (section) {
+          // Update active sidebar button
+          sidebarBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Show selected panel
+          Object.keys(contentPanels).forEach(key => {
+            contentPanels[key].classList.remove('active');
+          });
+          
+          if (contentPanels[section]) {
+            contentPanels[section].classList.add('active');
+          }
+        }
+      });
+    });
+    
+    // Clock functionality
+    function updateClock() {
+      const now = new Date();
+      
+      // Update header time
+      const timeString = now.toLocaleTimeString('pt-BR');
+      document.getElementById('headerTime').textContent = timeString;
+      
+      // Update header date
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateString = now.toLocaleDateString('pt-BR', options);
+      document.getElementById('headerDate').textContent = dateString;
+      
+      // Update analog clock
+      const hours = now.getHours() % 12;
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      
+      const hourDeg = (hours * 30) + (minutes * 0.5);
+      const minuteDeg = (minutes * 6) + (seconds * 0.1);
+      const secondDeg = seconds * 6;
+      
+      document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg)`;
+      document.getElementById('minuteHand').style.transform = `rotate(${minuteDeg}deg)`;
+      document.getElementById('secondHand').style.transform = `rotate(${secondDeg}deg)`;
+      
+      // Update digital time
+      document.getElementById('digitalTime').textContent = timeString;
+      document.getElementById('dateDisplay').textContent = dateString;
+      
+      // Update world clocks
+      updateWorldClocks();
+      
+      // Check alarms
+      checkAlarms(now);
+    }
+    
+    // World clocks
+    function updateWorldClocks() {
+      const now = new Date();
+      
+      // Brazil (UTC-3)
+      const brazilTime = new Date(now.getTime() + (-3 * 60 * 60 * 1000));
+      document.getElementById('brazilTime').textContent = brazilTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('brazilDate').textContent = brazilTime.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+      
+      // USA (UTC-5 or UTC-4 during DST)
+      const usaOffset = isDST(now) ? -4 : -5;
+      const usaTime = new Date(now.getTime() + (usaOffset * 60 * 60 * 1000));
+      document.getElementById('usaTime').textContent = usaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('usaDate').textContent = usaTime.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+      
+      // Japan (UTC+9)
+      const japanTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+      document.getElementById('japanTime').textContent = japanTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('japanDate').textContent = japanTime.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+      
+      // South Korea (UTC+9)
+      const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+      document.getElementById('koreaTime').textContent = koreaTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('koreaDate').textContent = koreaTime.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+      
+      // Portugal (UTC+0 or UTC+1 during BST)
+      const portugalOffset = isBST(now) ? 1 : 0;
+      const portugalTime = new Date(now.getTime() + (portugalOffset * 60 * 60 * 1000));
+      document.getElementById('portugalTime').textContent = portugalTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('portugalDate').textContent = portugalTime.toLocaleDateString('pt-BR', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+    
+    // Check if DST is in effect for USA
+    function isDST(date) {
+      const year = date.getFullYear();
+      // DST starts on the second Sunday of March
+      const dstStart = new Date(year, 2, 1);
+      dstStart.setDate(14 - dstStart.getDay()); // Second Sunday
+      // DST ends on the first Sunday of November
+      const dstEnd = new Date(year, 10, 1);
+      dstEnd.setDate(7 - dstEnd.getDay()); // First Sunday
+      
+      return date >= dstStart && date < dstEnd;
+    }
+    
+    // Check if BST is in effect for UK/Portugal
+    function isBST(date) {
+      const year = date.getFullYear();
+      // BST starts on the last Sunday of March
+      const bstStart = new Date(year, 2, 31);
+      bstStart.setDate(bstStart.getDate() - bstStart.getDay()); // Last Sunday
+      // BST ends on the last Sunday of October
+      const bstEnd = new Date(year, 9, 31);
+      bstEnd.setDate(bstEnd.getDate() - bstEnd.getDay()); // Last Sunday
+      
+      return date >= bstStart && date < bstEnd;
+    }
+    
+    // Alarms functionality
+    let alarms = [
+      {
+        id: 1,
+        name: 'Acordar',
+        time: '07:00',
+        days: [1, 2, 3, 4, 5], // Seg-Sex
+        active: true,
+        tag: '#ef4444',
+        sound: true
+      },
+      {
+        id: 2,
+        name: 'Almoço',
+        time: '12:30',
+        days: [1, 2, 3, 4, 5], // Seg-Sex
+        active: true,
+        tag: '#10b981',
+        sound: true
+      }
+    ];
+    
+    function renderAlarms() {
+      const alarmsList = document.getElementById('alarmsList');
+      alarmsList.innerHTML = '';
+      
+      if (alarms.length === 0) {
+        alarmsList.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 40px; font-size: 18px;">Nenhum alarme configurado</div>';
+        return;
+      }
+      
+      alarms.forEach(alarm => {
+        const alarmCard = document.createElement('div');
+        alarmCard.className = 'alarm-card animate-zoom-in';
+        alarmCard.innerHTML = `
+          <div class="alarm-time">${alarm.time}</div>
+          <div class="alarm-label">${alarm.name}</div>
+          <div class="alarm-days">
+            ${renderAlarmDays(alarm.days)}
+          </div>
+          ${alarm.tag ? `<div class="alarm-tags"><div class="alarm-tag" style="background: ${alarm.tag}20; color: ${alarm.tag};">Etiqueta</div></div>` : ''}
+          <div class="alarm-actions">
+            <button class="alarm-action-btn edit-alarm" data-id="${alarm.id}">Editar</button>
+            <button class="alarm-action-btn delete-alarm" data-id="${alarm.id}">Excluir</button>
+          </div>
+          <div class="alarm-toggle ${alarm.active ? 'active' : ''}" data-id="${alarm.id}">
+            <div class="toggle-circle"></div>
+          </div>
+        `;
+        
+        alarmsList.appendChild(alarmCard);
+      });
+      
+      // Add event listeners to toggles
+      document.querySelectorAll('.alarm-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+          const alarmId = parseInt(this.getAttribute('data-id'));
+          const alarm = alarms.find(a => a.id === alarmId);
+          if (alarm) {
+            alarm.active = !alarm.active;
+            this.classList.toggle('active');
+          }
+        });
+      });
+      
+      // Add event listeners to edit buttons
+      document.querySelectorAll('.edit-alarm').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const alarmId = parseInt(this.getAttribute('data-id'));
+          editAlarm(alarmId);
+        });
+      });
+      
+      // Add event listeners to delete buttons
+      document.querySelectorAll('.delete-alarm').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const alarmId = parseInt(this.getAttribute('data-id'));
+          if (confirm('Deseja excluir este alarme?')) {
+            alarms = alarms.filter(a => a.id !== alarmId);
+            renderAlarms();
+          }
+        });
+      });
+    }
+    
+    function renderAlarmDays(days) {
+      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      let html = '';
+      
+      for (let i = 0; i < 7; i++) {
+        const isActive = days.includes(i);
+        html += `<div class="alarm-day ${isActive ? 'active' : ''}">${dayNames[i]}</div>`;
+      }
+      
+      return html;
+    }
+    
+    function checkAlarms(now) {
+      const currentDay = now.getDay();
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      
+      alarms.forEach(alarm => {
+        if (!alarm.active) return;
+        
+        const [hours, minutes] = alarm.time.split(':').map(Number);
+        const alarmTime = hours * 60 + minutes;
+        
+        // Check if current day is in alarm days
+        if (alarm.days.includes(currentDay) && currentTime === alarmTime) {
+          // Trigger alarm notification
+          showNotification('Alarme', `${alarm.name} - ${alarm.time}`);
+          
+          // Play alarm sound
+          if (alarm.sound) {
+            const alarmSound = document.getElementById('alarmSound');
+            alarmSound.play();
+          }
+        }
+      });
+    }
+    
+    // Add alarm dialog
+    const addAlarmBtn = document.getElementById('addAlarmBtn');
+    const alarmDialogOverlay = document.getElementById('alarmDialogOverlay');
+    const closeAlarmDialog = document.getElementById('closeAlarmDialog');
+    const cancelAlarmBtn = document.getElementById('cancelAlarmBtn');
+    const saveAlarmBtn = document.getElementById('saveAlarmBtn');
+    
+    let editingAlarmId = null;
+    
+    addAlarmBtn.addEventListener('click', () => {
+      editingAlarmId = null;
+      document.getElementById('alarmName').value = '';
+      document.getElementById('alarmHours').value = '7';
+      document.getElementById('alarmMinutes').value = '0';
+      document.querySelectorAll('.day-selector').forEach(day => {
+        day.classList.remove('selected');
+      });
+      document.querySelectorAll('.tag-option').forEach(tag => {
+        tag.classList.remove('selected');
+      });
+      alarmDialogOverlay.classList.add('active');
+    });
+    
+    closeAlarmDialog.addEventListener('click', () => {
+      alarmDialogOverlay.classList.remove('active');
+    });
+    
+    cancelAlarmBtn.addEventListener('click', () => {
+      alarmDialogOverlay.classList.remove('active');
+    });
+    
+    saveAlarmBtn.addEventListener('click', () => {
+      const name = document.getElementById('alarmName').value || 'Alarme';
+      const hours = document.getElementById('alarmHours').value.padStart(2, '0');
+      const minutes = document.getElementById('alarmMinutes').value.padStart(2, '0');
+      const time = `${hours}:${minutes}`;
+      
+      // Get selected days
+      const selectedDays = [];
+      document.querySelectorAll('.day-selector.selected').forEach(day => {
+        selectedDays.push(parseInt(day.getAttribute('data-day')));
+      });
+      
+      // Get selected tag
+      let selectedTag = null;
+      document.querySelectorAll('.tag-option.selected').forEach(tag => {
+        selectedTag = tag.getAttribute('data-color');
+      });
+      
+      if (editingAlarmId) {
+        // Update existing alarm
+        const alarm = alarms.find(a => a.id === editingAlarmId);
+        if (alarm) {
+          alarm.name = name;
+          alarm.time = time;
+          alarm.days = selectedDays;
+          alarm.tag = selectedTag;
+        }
+      } else {
+        // Add new alarm
+        const newAlarm = {
+          id: Date.now(),
+          name,
+          time,
+          days: selectedDays,
+          active: true,
+          tag: selectedTag,
+          sound: true
+        };
+        
+        alarms.push(newAlarm);
+      }
+      
+      renderAlarms();
+      
+      // Close dialog
+      alarmDialogOverlay.classList.remove('active');
+    });
+    
+    // Edit alarm function
+    function editAlarm(alarmId) {
+      const alarm = alarms.find(a => a.id === alarmId);
+      if (!alarm) return;
+      
+      editingAlarmId = alarmId;
+      
+      // Fill form with alarm data
+      document.getElementById('alarmName').value = alarm.name;
+      
+      const [hours, minutes] = alarm.time.split(':');
+      document.getElementById('alarmHours').value = hours;
+      document.getElementById('alarmMinutes').value = minutes;
+      
+      // Select days
+      document.querySelectorAll('.day-selector').forEach(day => {
+        const dayNum = parseInt(day.getAttribute('data-day'));
+        if (alarm.days.includes(dayNum)) {
+          day.classList.add('selected');
+        } else {
+          day.classList.remove('selected');
+        }
+      });
+      
+      // Select tag
+      document.querySelectorAll('.tag-option').forEach(tag => {
+        if (tag.getAttribute('data-color') === alarm.tag) {
+          tag.classList.add('selected');
+        } else {
+          tag.classList.remove('selected');
+        }
+      });
+      
+      // Show dialog
+      alarmDialogOverlay.classList.add('active');
+    }
+    
+    // Day selector
+    document.querySelectorAll('.day-selector').forEach(day => {
+      day.addEventListener('click', function() {
+        this.classList.toggle('selected');
+      });
+    });
+    
+    // Tag selector
+    document.querySelectorAll('.tag-option').forEach(tag => {
+      tag.addEventListener('click', function() {
+        document.querySelectorAll('.tag-option').forEach(t => {
+          t.classList.remove('selected');
+        });
+        this.classList.add('selected');
+      });
+    });
+    
+    // Timer functionality
+    let timerInterval = null;
+    let timerSeconds = 0;
+    
+    const timerStartBtn = document.getElementById('timerStartBtn');
+    const timerResetBtn = document.getElementById('timerResetBtn');
+    const timerTime = document.getElementById('timerTime');
+    const timerHours = document.getElementById('timerHours');
+    const timerMinutes = document.getElementById('timerMinutes');
+    const timerSecondsInput = document.getElementById('timerSeconds');
+    
+    timerStartBtn.addEventListener('click', () => {
+      if (timerInterval) {
+        // Timer is running, pause it
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerStartBtn.innerHTML = '<i class="fas fa-play"></i>';
+      } else {
+        // Timer is not running, start it
+        const hours = parseInt(timerHours.value) || 0;
+        const minutes = parseInt(timerMinutes.value) || 0;
+        const seconds = parseInt(timerSecondsInput.value) || 0;
+        
+        timerSeconds = hours * 3600 + minutes * 60 + seconds;
+        
+        if (timerSeconds <= 0) return;
+        
+        timerInterval = setInterval(() => {
+          timerSeconds--;
+          
+          if (timerSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerStartBtn.innerHTML = '<i class="fas fa-play"></i>';
+            showNotification('Temporizador', 'O temporizador terminou!');
+            
+            // Play alarm sound
+            const alarmSound = document.getElementById('alarmSound');
+            alarmSound.play();
+            
+            return;
+          }
+          
+          updateTimerDisplay();
+        }, 1000);
+        
+        timerStartBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      }
+    });
+    
+    timerResetBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerSeconds = 0;
+      timerHours.value = 0;
+      timerMinutes.value = 0;
+      timerSecondsInput.value = 0;
+      updateTimerDisplay();
+      timerStartBtn.innerHTML = '<i class="fas fa-play"></i>';
+    });
+    
+    function updateTimerDisplay() {
+      const hours = Math.floor(timerSeconds / 3600);
+      const minutes = Math.floor((timerSeconds % 3600) / 60);
+      const seconds = timerSeconds % 60;
+      
+      timerTime.textContent = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    // Notification functionality
+    function showNotification(title, message) {
+      const notification = document.getElementById('notification');
+      const notificationTitle = document.getElementById('notificationTitle');
+      const notificationMessage = document.getElementById('notificationMessage');
+      const notificationClose = document.getElementById('notificationClose');
+      
+      notificationTitle.textContent = title;
+      notificationMessage.textContent = message;
+      
+      notification.classList.add('show');
+      
+      // Auto hide after 10 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 10000);
+      
+      notificationClose.addEventListener('click', () => {
+        notification.classList.remove('show');
+      });
+    }
+    
+    // Initialize
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderAlarms();
+    updateTimerDisplay();
+  </script>
+</body>
+</html>

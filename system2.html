@@ -1,0 +1,3049 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus Task Manager - Controle de Performance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #e2e8f0;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --rgb-red: #ff006e;
+      --rgb-green: #00ff88;
+      --rgb-blue: #00d9ff;
+      --neon-purple: #bf00ff;
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff0080;
+      
+      /* Cores dos recursos */
+      --cpu-color: #6366f1;
+      --mem-color: #8b5cf6;
+      --disk-color: #10b981;
+      --gpu-color: #ec4899;
+      --network-color: #00d4ff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .glass-light {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes rgbPulse {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .animate-rgb {
+      animation: rgbPulse 3s linear infinite;
+    }
+    
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    /* Window container */
+    .window {
+      width: 100%;
+      height: 100vh;
+      background: rgba(2, 2, 23, 0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: 0;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .app-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .system-stats {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .tab {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      padding: 16px 24px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tab:hover {
+      color: var(--light);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+    }
+    
+    .tab i {
+      font-size: 16px;
+    }
+    
+    /* Main content */
+    .content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      background: var(--dark);
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      border-right: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 20px;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.5);
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Resource category */
+    .resource-category {
+      margin-bottom: 28px;
+    }
+    
+    .category-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 1px;
+    }
+    
+    .category-title i {
+      color: var(--primary);
+    }
+    
+    /* Resource block */
+    .resource {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .resource:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .resource.selected {
+      background: rgba(99, 102, 241, 0.2);
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    .resource-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .resource-icon.cpu { 
+      background: linear-gradient(135deg, var(--cpu-color), var(--primary-dark));
+    }
+    
+    .resource-icon.mem { 
+      background: linear-gradient(135deg, var(--mem-color), var(--secondary));
+    }
+    
+    .resource-icon.disk { 
+      background: linear-gradient(135deg, var(--disk-color), #059669);
+    }
+    
+    .resource-icon.gpu { 
+      background: linear-gradient(135deg, var(--gpu-color), #db2777);
+    }
+    
+    .resource-icon.network { 
+      background: linear-gradient(135deg, var(--network-color), #0284c7);
+    }
+    
+    .resource-info {
+      flex: 1;
+    }
+    
+    .resource-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 4px;
+    }
+    
+    .resource-subtitle {
+      font-size: 13px;
+      color: var(--gray);
+    }
+    
+    /* Mini chart */
+    .mini-chart {
+      width: 70px;
+      height: 35px;
+      margin-left: 12px;
+    }
+    
+    .mini-chart svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Details panel */
+    .details-panel {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) transparent;
+    }
+    
+    .details-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .details-panel::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .details-panel::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    .details-panel::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    .details-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+      gap: 20px;
+    }
+    
+    .details-header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .details-header p {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    
+    .action-btn:hover {
+      background: rgba(99, 102, 241, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+    }
+    
+    /* Graph container */
+    .graph-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .graph-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .graph-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .graph-title i {
+      color: var(--primary);
+    }
+    
+    .graph-options {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .graph-option {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--gray);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .graph-option:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .graph-option.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Graph grid */
+    .graph-grid {
+      position: relative;
+      height: 220px;
+      width: 100%;
+      background: 
+        linear-gradient(to right, rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+      background-size: calc(100% / 12) calc(100% / 10);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .graph-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Animated line chart */
+    .animated-line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: dash 5s linear forwards;
+      filter: drop-shadow(0 0 5px currentColor);
+    }
+    
+    @keyframes dash {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    
+    /* Stats container */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    
+    .stat-card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--light);
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    
+    .stat-unit {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--gray);
+      margin-left: 4px;
+    }
+    
+    /* Process table */
+    .process-table-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .table-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .table-title i {
+      color: var(--primary);
+    }
+    
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 10px;
+      padding: 8px 16px;
+      width: 280px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .search-box i {
+      color: var(--gray);
+      margin-right: 12px;
+    }
+    
+    .search-box input {
+      border: none;
+      background: transparent;
+      color: var(--light);
+      width: 100%;
+      outline: none;
+      font-size: 14px;
+    }
+    
+    .process-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .process-table th {
+      text-align: left;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .process-table td {
+      padding: 16px 12px;
+      font-size: 14px;
+      color: var(--light);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    
+    .process-table tr:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .process-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .process-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--gray);
+      font-size: 16px;
+    }
+    
+    /* Info table */
+    .info-table {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .info-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .info-title i {
+      color: var(--primary);
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    }
+    
+    .info-label {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--light);
+    }
+    
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(15, 23, 42, 0.5);
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .footer-link {
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .footer-link:hover {
+      text-decoration: underline;
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.8);
+    }
+    
+    /* Tab content */
+    .tab-content {
+      display: none;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .tab-content.active {
+      display: flex;
+    }
+    
+    /* Memory specific styles */
+    .memory-usage-bar {
+      height: 28px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 12px;
+      position: relative;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .memory-usage-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--mem-color), var(--secondary));
+      border-radius: 14px;
+      width: 44%;
+      transition: width 1s ease;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+    }
+    
+    .memory-usage-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--light);
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Disk specific styles */
+    .disk-space-chart {
+      display: flex;
+      height: 220px;
+      margin-bottom: 28px;
+    }
+    
+    .disk-visual {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .donut-chart {
+      width: 200px;
+      height: 200px;
+      position: relative;
+    }
+    
+    .donut-segment {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      clip: rect(0, 200px, 200px, 100px);
+    }
+    
+    .donut-segment-1 {
+      background: var(--disk-color);
+      transform: rotate(0deg);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+    
+    .donut-segment-2 {
+      background: rgba(15, 23, 42, 0.7);
+      transform: rotate(126deg);
+    }
+    
+    .donut-inner {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 50%;
+      top: 30px;
+      left: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .donut-percent {
+      font-family: 'Orbitron', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--light);
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    }
+    
+    .donut-label {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .disk-details {
+      flex: 1;
+      padding: 0 24px;
+    }
+    
+    .disk-space-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .disk-space-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      margin-right: 16px;
+      box-shadow: 0 0 10px currentColor;
+    }
+    
+    .disk-space-info {
+      flex: 1;
+    }
+    
+    .disk-space-label {
+      font-size: 16px;
+      color: var(--light);
+      margin-bottom: 8px;
+    }
+    
+    .disk-space-bar {
+      height: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .disk-space-fill {
+      height: 100%;
+      border-radius: 5px;
+      box-shadow: 0 0 10px currentColor;
+    }
+    
+    .disk-space-value {
+      font-size: 16px;
+      color: var(--gray);
+      margin-left: 12px;
+      min-width: 100px;
+      text-align: right;
+    }
+    
+    /* GPU specific styles */
+    .gpu-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    
+    .gpu-stat-card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .gpu-stat-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .gpu-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--gpu-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+    }
+    
+    .gpu-stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--light);
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+    }
+    
+    .gpu-stat-bar {
+      height: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .gpu-stat-fill {
+      height: 100%;
+      background: var(--gpu-color);
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+    }
+    
+    /* RGB effects */
+    .rgb-glow {
+      text-shadow: 0 0 10px var(--rgb-red), 0 0 20px var(--rgb-green), 0 0 30px var(--rgb-blue);
+    }
+    
+    .rgb-border {
+      border: 2px solid;
+      border-image: linear-gradient(45deg, var(--rgb-red), var(--rgb-green), var(--rgb-blue)) 1;
+    }
+    
+    .rgb-gradient {
+      background: linear-gradient(45deg, var(--rgb-red), var(--rgb-green), var(--rgb-blue));
+    }
+    
+    /* Neon effects */
+    .neon-text {
+      text-shadow: 
+        0 0 5px var(--neon-purple),
+        0 0 10px var(--neon-purple),
+        0 0 15px var(--neon-purple),
+        0 0 20px var(--neon-purple);
+    }
+    
+    .neon-border {
+      border: 1px solid var(--neon-purple);
+      box-shadow: 
+        0 0 5px var(--neon-purple),
+        inset 0 0 5px var(--neon-purple);
+    }
+    
+    /* Gaming badges */
+    .gaming-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    }
+    
+    /* Performance indicators */
+    .perf-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    
+    .perf-low { background: var(--success); }
+    .perf-medium { background: var(--warning); }
+    .perf-high { background: var(--danger); }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 240px;
+      }
+      
+      .stats-container {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+      
+      .gpu-stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .disk-space-chart {
+        flex-direction: column;
+      }
+      
+      .system-stats {
+        display: none;
+      }
+      
+      .app-title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="window" role="application" aria-label="Gerenciador de Tarefas">
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon animate-glow">
+          <i class="fas fa-gamepad"></i>
+        </div>
+        <div class="app-title">NEXUS TASK MANAGER</div>
+      </div>
+      
+      <div class="system-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="headerCpu">1%</div>
+          <div class="stat-label">CPU</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerMem">44%</div>
+          <div class="stat-label">RAM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerGpu">0%</div>
+          <div class="stat-label">GPU</div>
+        </div>
+      </div>
+    </header>
+    
+    <nav class="tabs" role="tablist" aria-label="Categorias de gerenciamento">
+      <button role="tab" aria-selected="true" tabindex="0" class="tab active" data-tab="processes">
+        <i class="fas fa-microchip"></i>
+        <span>Processos</span>
+      </button>
+      <button role="tab" aria-selected="false" tabindex="-1" class="tab" data-tab="performance">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Desempenho</span>
+      </button>
+      <button role="tab" aria-selected="false" tabindex="-1" class="tab" data-tab="history">
+        <i class="fas fa-history"></i>
+        <span>Histórico</span>
+      </button>
+      <button role="tab" aria-selected="false" tabindex="-1" class="tab" data-tab="startup">
+        <i class="fas fa-rocket"></i>
+        <span>Startup</span>
+      </button>
+      <button role="tab" aria-selected="false" tabindex="-1" class="tab" data-tab="users">
+        <i class="fas fa-users"></i>
+        <span>Usuários</span>
+      </button>
+    </nav>
+    
+    <main class="content">
+      <!-- Processos Tab Content -->
+      <div id="processes" class="tab-content active">
+        <aside class="sidebar" role="list" aria-label="Recursos do sistema">
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-fire"></i>
+              <span>Recursos do Sistema</span>
+            </div>
+            <button class="resource selected" role="listitem" aria-current="true" tabindex="0" aria-label="CPU 1 por cento de uso 2 vírgula 49 gigahertz">
+              <div class="resource-icon cpu">
+                <i class="fas fa-microchip"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">CPU</span>
+                <span class="resource-subtitle">1% • 2,49 GHz</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--cpu-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,27 10,24 18,19 26,20 34,17 42,21 50,12 58,28 66,16 74,19 82,25 90,23 98,28" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Memória 6 vírgula 9 de quinze vírgula 8 gigabytes quarenta e quatro por cento">
+              <div class="resource-icon mem">
+                <i class="fas fa-memory"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Memória</span>
+                <span class="resource-subtitle">6,9/15,8 GB (44%)</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--mem-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,26 10,20 18,15 26,25 34,20 42,22 50,20 58,22 66,18 74,19 82,23 90,21 98,20" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Disco zero C SSD zero por cento">
+              <div class="resource-icon disk">
+                <i class="fas fa-hdd"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Disco</span>
+                <span class="resource-subtitle">SSD 0%</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--disk-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,25 10,22 18,17 26,20 34,22 42,18 50,15 58,10 66,10 74,15 82,12 90,12 98,13" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="GPU zero AMD Radeon R7 200 series zero por cento trinta e um graus Celsius">
+              <div class="resource-icon gpu">
+                <i class="fas fa-tv"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">GPU</span>
+                <span class="resource-subtitle">0% (31 °C)</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--gpu-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,27 10,25 18,20 26,18 34,23 42,21 50,28 58,19 66,28 74,22 82,23 90,24 98,18" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Rede zero Kbps">
+              <div class="resource-icon network">
+                <i class="fas fa-network-wired"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Rede</span>
+                <span class="resource-subtitle">0 Kbps</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--network-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,25 10,22 18,17 26,20 34,22 42,18 50,15 58,10 66,10 74,15 82,12 90,12 98,13" />
+                </svg>
+              </div>
+            </button>
+          </div>
+          
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-gamepad"></i>
+              <span>Modo Gamer</span>
+            </div>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--danger), var(--warning));">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Boost de Performance</span>
+                <span class="resource-subtitle">Overclock ativado</span>
+              </div>
+              <div class="gaming-badge">ON</div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--success), var(--primary));">
+                <i class="fas fa-fan"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Cooling System</span>
+                <span class="resource-subtitle">Modo extremo</span>
+              </div>
+              <div class="gaming-badge">MAX</div>
+            </button>
+          </div>
+        </aside>
+        
+        <section class="details-panel" aria-live="polite" aria-atomic="true" aria-relevant="all">
+          <header class="details-header">
+            <h1>Processos</h1>
+            <p>Monitoramento em tempo real</p>
+          </header>
+          
+          <div class="action-buttons">
+            <button class="action-btn primary">
+              <i class="fas fa-plus-circle"></i>
+              <span>Nova Tarefa</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-search-plus"></i>
+              <span>Pesquisar Online</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-sync-alt"></i>
+              <span>Atualizar</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-skull-crossbones"></i>
+              <span>Terminar Processo</span>
+            </button>
+          </div>
+          
+          <div class="process-table-container">
+            <div class="table-header">
+              <div class="table-title">
+                <i class="fas fa-microchip"></i>
+                <span>Processos Ativos</span>
+              </div>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar processo...">
+              </div>
+            </div>
+            <table class="process-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPU</th>
+                  <th>Memória</th>
+                  <th>Disco</th>
+                  <th>Rede</th>
+                  <th>GPU</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon">
+                        <i class="fas fa-cube"></i>
+                      </div>
+                      <span>System</span>
+                    </div>
+                  </td>
+                  <td>0%</td>
+                  <td>120 KB</td>
+                  <td>0 MB/s</td>
+                  <td>0 Kbps</td>
+                  <td>0%</td>
+                  <td><span class="perf-indicator perf-low"></span>Normal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon">
+                        <i class="fas fa-desktop"></i>
+                      </div>
+                      <span>Windows Explorer</span>
+                    </div>
+                  </td>
+                  <td>0%</td>
+                  <td>85,4 MB</td>
+                  <td>0 MB/s</td>
+                  <td>0 Kbps</td>
+                  <td>0%</td>
+                  <td><span class="perf-indicator perf-low"></span>Normal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff1b2d, #ff6000);">
+                        <i class="fab fa-opera"></i>
+                      </div>
+                      <span>Opera GX</span>
+                    </div>
+                  </td>
+                  <td>0,3%</td>
+                  <td>425,8 MB</td>
+                  <td>0,1 MB/s</td>
+                  <td>12 Kbps</td>
+                  <td>1%</td>
+                  <td><span class="perf-indicator perf-medium"></span>Médio</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #007acc, #00a2ed);">
+                        <i class="fas fa-code"></i>
+                      </div>
+                      <span>VS Code</span>
+                    </div>
+                  </td>
+                  <td>0,1%</td>
+                  <td>215,3 MB</td>
+                  <td>0 MB/s</td>
+                  <td>0 Kbps</td>
+                  <td>0%</td>
+                  <td><span class="perf-indicator perf-low"></span>Normal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #1ed760, #1db954);">
+                        <i class="fab fa-spotify"></i>
+                      </div>
+                      <span>Spotify</span>
+                    </div>
+                  </td>
+                  <td>0,2%</td>
+                  <td>185,7 MB</td>
+                  <td>0 MB/s</td>
+                  <td>8 Kbps</td>
+                  <td>0%</td>
+                  <td><span class="perf-indicator perf-low"></span>Normal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
+                        <i class="fab fa-steam"></i>
+                      </div>
+                      <span>Steam</span>
+                    </div>
+                  </td>
+                  <td>0,4%</td>
+                  <td>325,2 MB</td>
+                  <td>0,2 MB/s</td>
+                  <td>15 Kbps</td>
+                  <td>2%</td>
+                  <td><span class="perf-indicator perf-medium"></span>Médio</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #00d4ff, #0066ff);">
+                        <i class="fab fa-discord"></i>
+                      </div>
+                      <span>Discord</span>
+                    </div>
+                  </td>
+                  <td>0,1%</td>
+                  <td>125,8 MB</td>
+                  <td>0 MB/s</td>
+                  <td>5 Kbps</td>
+                  <td>0%</td>
+                  <td><span class="perf-indicator perf-low"></span>Normal</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #171a21, #66c0f4);">
+                        <i class="fas fa-gamepad"></i>
+                      </div>
+                      <span>CS:GO</span>
+                    </div>
+                  </td>
+                  <td>12,5%</td>
+                  <td>1,2 GB</td>
+                  <td>0,5 MB/s</td>
+                  <td>25 Kbps</td>
+                  <td>45%</td>
+                  <td><span class="perf-indicator perf-high"></span>Alto</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="info-table">
+            <div class="info-title">
+              <i class="fas fa-chart-line"></i>
+              <span>Resumo do Sistema</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Processos:</span>
+                <span class="info-value">175</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Uso da CPU:</span>
+                <span class="info-value">1%</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Memória disponível:</span>
+                <span class="info-value">8,9 GB</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Disco disponível:</span>
+                <span class="info-value">245 GB</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tempo de atividade:</span>
+                <span class="info-value">13:03:06:18</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Temperatura CPU:</span>
+                <span class="info-value">42°C</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Temperatura GPU:</span>
+                <span class="info-value">31°C</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">FPS Médio:</span>
+                <span class="info-value">144</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Desempenho Tab Content -->
+      <div id="performance" class="tab-content">
+        <aside class="sidebar" role="list" aria-label="Recursos do sistema">
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Monitoramento</span>
+            </div>
+            <button class="resource selected" role="listitem" aria-current="true" tabindex="0" aria-label="CPU 1 por cento de uso 2 vírgula 49 gigahertz">
+              <div class="resource-icon cpu">
+                <i class="fas fa-microchip"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">CPU</span>
+                <span class="resource-subtitle">1% • 2,49 GHz</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--cpu-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,27 10,24 18,19 26,20 34,17 42,21 50,12 58,28 66,16 74,19 82,25 90,23 98,28" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Memória 6 vírgula 9 de quinze vírgula 8 gigabytes quarenta e quatro por cento">
+              <div class="resource-icon mem">
+                <i class="fas fa-memory"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Memória</span>
+                <span class="resource-subtitle">6,9/15,8 GB (44%)</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--mem-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,26 10,20 18,15 26,25 34,20 42,22 50,20 58,22 66,18 74,19 82,23 90,21 98,20" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Disco zero C SSD zero por cento">
+              <div class="resource-icon disk">
+                <i class="fas fa-hdd"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Disco</span>
+                <span class="resource-subtitle">SSD 0%</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--disk-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,25 10,22 18,17 26,20 34,22 42,18 50,15 58,10 66,10 74,15 82,12 90,12 98,13" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="GPU zero AMD Radeon R7 200 series zero por cento trinta e um graus Celsius">
+              <div class="resource-icon gpu">
+                <i class="fas fa-tv"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">GPU</span>
+                <span class="resource-subtitle">0% (31 °C)</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--gpu-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,27 10,25 18,20 26,18 34,23 42,21 50,28 58,19 66,28 74,22 82,23 90,24 98,18" />
+                </svg>
+              </div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1" aria-label="Rede zero Kbps">
+              <div class="resource-icon network">
+                <i class="fas fa-network-wired"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Rede</span>
+                <span class="resource-subtitle">0 Kbps</span>
+              </div>
+              <div class="mini-chart" aria-hidden="true">
+                <svg viewBox="0 0 100 30" preserveAspectRatio="none" fill="none" stroke="var(--network-color)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+                  <polyline class="animated-line" points="2,25 10,22 18,17 26,20 34,22 42,18 50,15 58,10 66,10 74,15 82,12 90,12 98,13" />
+                </svg>
+              </div>
+            </button>
+          </div>
+          
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-sliders-h"></i>
+              <span>Configurações Gamer</span>
+            </div>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-magic"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Game Mode</span>
+                <span class="resource-subtitle">Otimizado para jogos</span>
+              </div>
+              <div class="gaming-badge">ON</div>
+            </button>
+            
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--warning), var(--danger));">
+                <i class="fas fa-rocket"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Overclock</span>
+                <span class="resource-subtitle">+20% performance</span>
+              </div>
+              <div class="gaming-badge">OC</div>
+            </button>
+          </div>
+        </aside>
+        
+        <section class="details-panel" aria-live="polite" aria-atomic="true" aria-relevant="all">
+          <!-- CPU Details Panel -->
+          <div id="cpu-details" class="hardware-details">
+            <header class="details-header">
+              <h1>CPU</h1>
+              <p>Intel Core i9-9900K @ 5.0GHz</p>
+            </header>
+            
+            <div class="action-buttons">
+              <button class="action-btn primary">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitor Avançado</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-cogs"></i>
+                <span>Overclock</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-sync-alt"></i>
+                <span>Atualizar</span>
+              </button>
+            </div>
+            
+            <div class="graph-container" aria-label="Gráfico de utilização da CPU percentual">
+              <div class="graph-header">
+                <div class="graph-title">
+                  <i class="fas fa-microchip"></i>
+                  <span>Utilização da CPU</span>
+                </div>
+                <div class="graph-options">
+                  <button class="graph-option active">Total</button>
+                  <button class="graph-option">Núcleos</button>
+                  <button class="graph-option">Threads</button>
+                </div>
+              </div>
+              <div class="graph-grid" id="cpuGraphGrid" aria-hidden="true">
+                <svg class="graph-svg" id="cpu-graph" aria-hidden="true" viewBox="0 0 100 200" preserveAspectRatio="none">
+                  <polyline class="animated-line cpu-line" fill="none" stroke="var(--cpu-color)" stroke-width="3" points="
+                    0,170 8,160 16,150 24,140 32,160
+                    40,130 48,110 56,120 64,90 72,150
+                    80,123 88,140 96,170 100,170
+                  " />
+                </svg>
+              </div>
+            </div>
+            
+            <div class="stats-container" aria-label="Estatísticas principais da CPU">
+              <div class="stat-card">
+                <div class="stat-label">Utilização</div>
+                <div class="stat-value">1<span class="stat-unit">%</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Velocidade</div>
+                <div class="stat-value">5,0<span class="stat-unit">GHz</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Temperatura</div>
+                <div class="stat-value">42<span class="stat-unit">°C</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Processos</div>
+                <div class="stat-value">175</div>
+              </div>
+            </div>
+            
+            <div class="info-table" aria-label="Informações adicionais do CPU">
+              <div class="info-title">
+                <i class="fas fa-info-circle"></i>
+                <span>Informações do Processador</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Modelo:</span>
+                  <span class="info-value">Intel Core i9-9900K</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Núcleos:</span>
+                  <span class="info-value">8</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Threads:</span>
+                  <span class="info-value">16</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Cache L3:</span>
+                  <span class="info-value">16 MB</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">TDP:</span>
+                  <span class="info-value">95W</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Overclock:</span>
+                  <span class="info-value">5.0 GHz</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Memory Details Panel (Hidden by default) -->
+          <div id="memory-details" class="hardware-details" style="display: none;">
+            <header class="details-header">
+              <h1>Memória</h1>
+              <p>32GB DDR4 RGB 3600MHz</p>
+            </header>
+            
+            <div class="action-buttons">
+              <button class="action-btn primary">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitor Avançado</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-broom"></i>
+                <span>Limpar Memória</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-palette"></i>
+                <span>RGB Control</span>
+              </button>
+            </div>
+            
+            <div class="graph-container" aria-label="Gráfico de utilização da memória">
+              <div class="graph-header">
+                <div class="graph-title">
+                  <i class="fas fa-memory"></i>
+                  <span>Utilização da Memória</span>
+                </div>
+                <div class="graph-options">
+                  <button class="graph-option active">Composta</button>
+                  <button class="graph-option">Commit</button>
+                  <button class="graph-option">Cache</button>
+                </div>
+              </div>
+              <div class="graph-grid" aria-hidden="true">
+                <svg class="graph-svg" aria-hidden="true" viewBox="0 0 100 200" preserveAspectRatio="none">
+                  <polyline class="animated-line mem-line" fill="none" stroke="var(--mem-color)" stroke-width="3" points="
+                    0,170 8,160 16,150 24,140 32,130
+                    40,120 48,110 56,100 64,90 72,80
+                    80,70 88,60 96,50 100,40
+                  " />
+                </svg>
+              </div>
+            </div>
+            
+            <div class="stats-container" aria-label="Estatísticas principais da memória">
+              <div class="stat-card">
+                <div class="stat-label">Em uso</div>
+                <div class="stat-value">6,9<span class="stat-unit">GB</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Disponível</div>
+                <div class="stat-value">25,1<span class="stat-unit">GB</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Velocidade</div>
+                <div class="stat-value">3600<span class="stat-unit">MHz</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Latência</div>
+                <div class="stat-value">16<span class="stat-unit">CL</span></div>
+              </div>
+            </div>
+            
+            <div class="memory-usage-bar">
+              <div class="memory-usage-fill"></div>
+              <div class="memory-usage-text">6,9 GB de 32 GB em uso (22%)</div>
+            </div>
+            
+            <div class="info-table" aria-label="Informações adicionais da memória">
+              <div class="info-title">
+                <i class="fas fa-info-circle"></i>
+                <span>Informações da Memória</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Tipo:</span>
+                  <span class="info-value">DDR4 RGB</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Capacidade:</span>
+                  <span class="info-value">32 GB (4x8GB)</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Canais:</span>
+                  <span class="info-value">Dual Channel</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">XMP:</span>
+                  <span class="info-value">Ativado</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Iluminação:</span>
+                  <span class="info-value">Rainbow Wave</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Fabricante:</span>
+                  <span class="info-value">Corsair Vengeance</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Disk Details Panel (Hidden by default) -->
+          <div id="disk-details" class="hardware-details" style="display: none;">
+            <header class="details-header">
+              <h1>Armazenamento</h1>
+              <p>Samsung 970 EVO Plus 1TB NVMe</p>
+            </header>
+            
+            <div class="action-buttons">
+              <button class="action-btn primary">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitor Avançado</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-broom"></i>
+                <span>Otimizar</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-shield-alt"></i>
+                <span>Segurança</span>
+              </button>
+            </div>
+            
+            <div class="disk-space-chart">
+              <div class="disk-visual">
+                <div class="donut-chart">
+                  <div class="donut-segment donut-segment-1"></div>
+                  <div class="donut-segment donut-segment-2"></div>
+                  <div class="donut-inner">
+                    <div class="donut-percent">35%</div>
+                    <div class="donut-label">Usado</div>
+                  </div>
+                </div>
+              </div>
+              <div class="disk-details">
+                <div class="disk-space-item">
+                  <div class="disk-space-color" style="background: var(--disk-color);"></div>
+                  <div class="disk-space-info">
+                    <div class="disk-space-label">Sistema</div>
+                    <div class="disk-space-bar">
+                      <div class="disk-space-fill" style="width: 25%; background: var(--disk-color);"></div>
+                    </div>
+                  </div>
+                  <div class="disk-space-value">250 GB</div>
+                </div>
+                <div class="disk-space-item">
+                  <div class="disk-space-color" style="background: var(--mem-color);"></div>
+                  <div class="disk-space-info">
+                    <div class="disk-space-label">Jogos</div>
+                    <div class="disk-space-bar">
+                      <div class="disk-space-fill" style="width: 10%; background: var(--mem-color);"></div>
+                    </div>
+                  </div>
+                  <div class="disk-space-value">100 GB</div>
+                </div>
+                <div class="disk-space-item">
+                  <div class="disk-space-color" style="background: var(--gpu-color);"></div>
+                  <div class="disk-space-info">
+                    <div class="disk-space-label">Mídia</div>
+                    <div class="disk-space-bar">
+                      <div class="disk-space-fill" style="width: 5%; background: var(--gpu-color);"></div>
+                    </div>
+                  </div>
+                  <div class="disk-space-value">50 GB</div>
+                </div>
+                <div class="disk-space-item">
+                  <div class="disk-space-color" style="background: rgba(15, 23, 42, 0.7);"></div>
+                  <div class="disk-space-info">
+                    <div class="disk-space-label">Livre</div>
+                    <div class="disk-space-bar">
+                      <div class="disk-space-fill" style="width: 60%; background: rgba(15, 23, 42, 0.7);"></div>
+                    </div>
+                  </div>
+                  <div class="disk-space-value">600 GB</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stats-container" aria-label="Estatísticas principais do disco">
+              <div class="stat-card">
+                <div class="stat-label">Leitura</div>
+                <div class="stat-value">3.500<span class="stat-unit">MB/s</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Escrita</div>
+                <div class="stat-value">3.300<span class="stat-unit">MB/s</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Temperatura</div>
+                <div class="stat-value">32<span class="stat-unit">°C</span></div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Saúde</div>
+                <div class="stat-value">100<span class="stat-unit">%</span></div>
+              </div>
+            </div>
+            
+            <div class="info-table" aria-label="Informações adicionais do disco">
+              <div class="info-title">
+                <i class="fas fa-info-circle"></i>
+                <span>Informações do SSD</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Modelo:</span>
+                  <span class="info-value">Samsung 970 EVO Plus</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Interface:</span>
+                  <span class="info-value">NVMe PCIe 3.0</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Forma:</span>
+                  <span class="info-value">M.2 2280</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">TBW:</span>
+                  <span class="info-value">600 TB</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Garantia:</span>
+                  <span class="info-value">5 anos</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Firmware:</span>
+                  <span class="info-value">2B2QEXM7</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- GPU Details Panel (Hidden by default) -->
+          <div id="gpu-details" class="hardware-details" style="display: none;">
+            <header class="details-header">
+              <h1>GPU</h1>
+              <p>NVIDIA GeForce RTX 3080 Ti</p>
+            </header>
+            
+            <div class="action-buttons">
+              <button class="action-btn primary">
+                <i class="fas fa-chart-line"></i>
+                <span>Monitor Avançado</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-bolt"></i>
+                <span>Overclock</span>
+              </button>
+              <button class="action-btn">
+                <i class="fas fa-fan"></i>
+                <span>Cooling</span>
+              </button>
+            </div>
+            
+            <div class="gpu-stats-grid">
+              <div class="gpu-stat-card">
+                <div class="gpu-stat-title">
+                  <div class="gpu-stat-icon">
+                    <i class="fas fa-tachometer-alt"></i>
+                  </div>
+                  <span>Utilização da GPU</span>
+                </div>
+                <div class="gpu-stat-value">0%</div>
+                <div class="gpu-stat-bar">
+                  <div class="gpu-stat-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+              
+              <div class="gpu-stat-card">
+                <div class="gpu-stat-title">
+                  <div class="gpu-stat-icon">
+                    <i class="fas fa-temperature-high"></i>
+                  </div>
+                  <span>Temperatura</span>
+                </div>
+                <div class="gpu-stat-value">31°C</div>
+                <div class="gpu-stat-bar">
+                  <div class="gpu-stat-fill" style="width: 15%;"></div>
+                </div>
+              </div>
+              
+              <div class="gpu-stat-card">
+                <div class="gpu-stat-title">
+                  <div class="gpu-stat-icon">
+                    <i class="fas fa-memory"></i>
+                  </div>
+                  <span>Memória VRAM</span>
+                </div>
+                <div class="gpu-stat-value">1,2 GB</div>
+                <div class="gpu-stat-bar">
+                  <div class="gpu-stat-fill" style="width: 10%;"></div>
+                </div>
+              </div>
+              
+              <div class="gpu-stat-card">
+                <div class="gpu-stat-title">
+                  <div class="gpu-stat-icon">
+                    <i class="fas fa-bolt"></i>
+                  </div>
+                  <span>Power Limit</span>
+                </div>
+                <div class="gpu-stat-value">65%</div>
+                <div class="gpu-stat-bar">
+                  <div class="gpu-stat-fill" style="width: 65%;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="graph-container" aria-label="Gráfico de utilização da GPU">
+              <div class="graph-header">
+                <div class="graph-title">
+                  <i class="fas fa-tv"></i>
+                  <span>Utilização da GPU</span>
+                </div>
+                <div class="graph-options">
+                  <button class="graph-option active">3D</button>
+                  <button class="graph-option">Vídeo</button>
+                  <button class="graph-option">Compute</button>
+                </div>
+              </div>
+              <div class="graph-grid" aria-hidden="true">
+                <svg class="graph-svg" aria-hidden="true" viewBox="0 0 100 200" preserveAspectRatio="none">
+                  <polyline class="animated-line gpu-line" fill="none" stroke="var(--gpu-color)" stroke-width="3" points="
+                    0,170 8,160 16,150 24,140 32,130
+                    40,120 48,110 56,100 64,90 72,80
+                    80,70 88,60 96,50 100,40
+                  " />
+                </svg>
+              </div>
+            </div>
+            
+            <div class="info-table" aria-label="Informações adicionais da GPU">
+              <div class="info-title">
+                <i class="fas fa-info-circle"></i>
+                <span>Informações da GPU</span>
+              </div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Modelo:</span>
+                  <span class="info-value">RTX 3080 Ti</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Arquitetura:</span>
+                  <span class="info-value">Ampere</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">VRAM:</span>
+                  <span class="info-value">12 GB GDDR6X</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Ray Tracing:</span>
+                  <span class="info-value">2ª Geração</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">DLSS:</span>
+                  <span class="info-value">Ativado</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Driver:</span>
+                  <span class="info-value">516.94</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Histórico Tab Content -->
+      <div id="history" class="tab-content">
+        <aside class="sidebar" role="list" aria-label="Recursos do sistema">
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-clock"></i>
+              <span>Período</span>
+            </div>
+            <button class="resource selected" role="listitem" aria-current="true" tabindex="0">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-calendar-day"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Hoje</span>
+                <span class="resource-subtitle">Sessões ativas</span>
+              </div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--warning), var(--danger));">
+                <i class="fas fa-calendar-week"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Últimos 7 dias</span>
+                <span class="resource-subtitle">Histórico completo</span>
+              </div>
+            </button>
+          </div>
+          
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-gamepad"></i>
+              <span>Atividade Gamer</span>
+            </div>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--success), var(--primary));">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Jogados Recentemente</span>
+                <span class="resource-subtitle">Últimos jogos</span>
+              </div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--accent), var(--danger));">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Estatísticas</span>
+                <span class="resource-subtitle">Performance</span>
+              </div>
+            </button>
+          </div>
+        </aside>
+        
+        <section class="details-panel" aria-live="polite" aria-atomic="true" aria-relevant="all">
+          <header class="details-header">
+            <h1>Histórico de Aplicativos</h1>
+            <p>Atividade recente do sistema</p>
+          </header>
+          
+          <div class="action-buttons">
+            <button class="action-btn primary">
+              <i class="fas fa-trash-alt"></i>
+              <span>Limpar Histórico</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-download"></i>
+              <span>Exportar Dados</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-cog"></i>
+              <span>Configurações</span>
+            </button>
+          </div>
+          
+          <div class="process-table-container">
+            <div class="table-header">
+              <div class="table-title">
+                <i class="fas fa-history"></i>
+                <span>Aplicativos Usados Hoje</span>
+              </div>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar aplicativo...">
+              </div>
+            </div>
+            <table class="process-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Uso da CPU</th>
+                  <th>Uso da GPU</th>
+                  <th>Tempo de Uso</th>
+                  <th>Último Acesso</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff1b2d, #ff6000);">
+                        <i class="fab fa-opera"></i>
+                      </div>
+                      <span>Opera GX</span>
+                    </div>
+                  </td>
+                  <td>0,3%</td>
+                  <td>1%</td>
+                  <td>3h 45m</td>
+                  <td>14:32</td>
+                  <td><span class="perf-indicator perf-low"></span>Ativo</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #007acc, #00a2ed);">
+                        <i class="fas fa-code"></i>
+                      </div>
+                      <span>VS Code</span>
+                    </div>
+                  </td>
+                  <td>0,1%</td>
+                  <td>0%</td>
+                  <td>2h 15m</td>
+                  <td>12:45</td>
+                  <td><span class="perf-indicator perf-low"></span>Ativo</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #1ed760, #1db954);">
+                        <i class="fab fa-spotify"></i>
+                      </div>
+                      <span>Spotify</span>
+                    </div>
+                  </td>
+                  <td>0,2%</td>
+                  <td>0%</td>
+                  <td>1h 30m</td>
+                  <td>11:20</td>
+                  <td><span class="perf-indicator perf-low"></span>Ativo</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
+                        <i class="fab fa-steam"></i>
+                      </div>
+                      <span>Steam</span>
+                    </div>
+                  </td>
+                  <td>0,4%</td>
+                  <td>2%</td>
+                  <td>45m</td>
+                  <td>10:15</td>
+                  <td><span class="perf-indicator perf-medium"></span>Ativo</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #171a21, #66c0f4);">
+                        <i class="fas fa-gamepad"></i>
+                      </div>
+                      <span>CS:GO</span>
+                    </div>
+                  </td>
+                  <td>12,5%</td>
+                  <td>45%</td>
+                  <td>2h 30m</td>
+                  <td>09:45</td>
+                  <td><span class="perf-indicator perf-high"></span>Jogando</td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #00d4ff, #0066ff);">
+                        <i class="fab fa-discord"></i>
+                      </div>
+                      <span>Discord</span>
+                    </div>
+                  </td>
+                  <td>0,1%</td>
+                  <td>0%</td>
+                  <td>4h 15m</td>
+                  <td>08:30</td>
+                  <td><span class="perf-indicator perf-low"></span>Ativo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="info-table">
+            <div class="info-title">
+              <i class="fas fa-chart-line"></i>
+              <span>Resumo de Uso</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Tempo total:</span>
+                <span class="info-value">14h 45m</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Jogos jogados:</span>
+                <span class="info-value">3</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">FPS médio:</span>
+                <span class="info-value">144</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Temperatura média:</span>
+                <span class="info-value">38°C</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Inicializar Tab Content -->
+      <div id="startup" class="tab-content">
+        <aside class="sidebar" role="list" aria-label="Recursos do sistema">
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-rocket"></i>
+              <span>Impacto na Inicialização</span>
+            </div>
+            <button class="resource selected" role="listitem" aria-current="true" tabindex="0">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--danger), var(--warning));">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Alto impacto</span>
+                <span class="resource-subtitle">Afeta performance</span>
+              </div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--warning), var(--primary));">
+                <i class="fas fa-minus-circle"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Médio impacto</span>
+                <span class="resource-subtitle">Impacto moderado</span>
+              </div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--success), var(--primary));">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Baixo impacto</span>
+                <span class="resource-subtitle">Mínimo efeito</span>
+              </div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--gray), var(--dark));">
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Não medido</span>
+                <span class="resource-subtitle">Sem dados</span>
+              </div>
+            </button>
+          </div>
+          
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-gamepad"></i>
+              <span>Startup Gamer</span>
+            </div>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Fast Boot</span>
+                <span class="resource-subtitle">Inicialização rápida</span>
+              </div>
+              <div class="gaming-badge">ON</div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--accent), var(--danger));">
+                <i class="fas fa-magic"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Game Optimizer</span>
+                <span class="resource-subtitle">Otimização automática</span>
+              </div>
+              <div class="gaming-badge">PRO</div>
+            </button>
+          </div>
+        </aside>
+        
+        <section class="details-panel" aria-live="polite" aria-atomic="true" aria-relevant="all">
+          <header class="details-header">
+            <h1>Aplicativos de Inicialização</h1>
+            <p>Gerencie aplicativos que iniciam com o sistema</p>
+          </header>
+          
+          <div class="action-buttons">
+            <button class="action-btn primary">
+              <i class="fas fa-plus-circle"></i>
+              <span>Adicionar App</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-folder-open"></i>
+              <span>Abrir Local</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-sync-alt"></i>
+              <span>Atualizar</span>
+            </button>
+          </div>
+          
+          <div class="process-table-container">
+            <div class="table-header">
+              <div class="table-title">
+                <i class="fas fa-rocket"></i>
+                <span>Aplicativos de Inicialização</span>
+              </div>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar aplicativo...">
+              </div>
+            </div>
+            <table class="process-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Editor</th>
+                  <th>Status</th>
+                  <th>Impacto</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #1ed760, #1db954);">
+                        <i class="fab fa-spotify"></i>
+                      </div>
+                      <span>Spotify</span>
+                    </div>
+                  </td>
+                  <td>Spotify AB</td>
+                  <td>Habilitado</td>
+                  <td>Alto impacto</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
+                        <i class="fab fa-steam"></i>
+                      </div>
+                      <span>Steam</span>
+                    </div>
+                  </td>
+                  <td>Valve Corporation</td>
+                  <td>Habilitado</td>
+                  <td>Alto impacto</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #00d4ff, #0066ff);">
+                        <i class="fab fa-discord"></i>
+                      </div>
+                      <span>Discord</span>
+                    </div>
+                  </td>
+                  <td>Discord Inc.</td>
+                  <td>Habilitado</td>
+                  <td>Médio impacto</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff1b2d, #ff6000);">
+                        <i class="fab fa-opera"></i>
+                      </div>
+                      <span>Opera GX</span>
+                    </div>
+                  </td>
+                  <td>Opera Software</td>
+                  <td>Habilitado</td>
+                  <td>Baixo impacto</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-toggle-on"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, #ff0000, #cc0000);">
+                        <i class="fab fa-adobe"></i>
+                      </div>
+                      <span>Adobe Creative Cloud</span>
+                    </div>
+                  </td>
+                  <td>Adobe Inc.</td>
+                  <td>Desabilitado</td>
+                  <td>Médio impacto</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-toggle-off"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="info-table">
+            <div class="info-title">
+              <i class="fas fa-chart-line"></i>
+              <span>Estatísticas de Inicialização</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Último boot:</span>
+                <span class="info-value">14:32:15</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tempo de boot:</span>
+                <span class="info-value">8,5 segundos</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Apps ativos:</span>
+                <span class="info-value">4 de 12</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Impacto total:</span>
+                <span class="info-value">Médio</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+      
+      <!-- Usuários Tab Content -->
+      <div id="users" class="tab-content">
+        <aside class="sidebar" role="list" aria-label="Recursos do sistema">
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-users"></i>
+              <span>Usuários Ativos</span>
+            </div>
+            <button class="resource selected" role="listitem" aria-current="true" tabindex="0">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Usuários</span>
+                <span class="resource-subtitle">Sessões ativas</span>
+              </div>
+            </button>
+          </div>
+          
+          <div class="resource-category">
+            <div class="category-title">
+              <i class="fas fa-gamepad"></i>
+              <span>Perfis Gamer</span>
+            </div>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--accent), var(--danger));">
+                <i class="fas fa-crown"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Perfil Principal</span>
+                <span class="resource-subtitle">Configurações otimizadas</span>
+              </div>
+              <div class="gaming-badge">PRO</div>
+            </button>
+            <button class="resource" role="listitem" tabindex="-1">
+              <div class="resource-icon" style="background: linear-gradient(135deg, var(--success), var(--primary));">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="resource-info">
+                <span class="resource-title">Adicionar Perfil</span>
+                <span class="resource-subtitle">Novo perfil gamer</span>
+              </div>
+            </button>
+          </div>
+        </aside>
+        
+        <section class="details-panel" aria-live="polite" aria-atomic="true" aria-relevant="all">
+          <header class="details-header">
+            <h1>Usuários</h1>
+            <p>Gerencie sessões de usuário</p>
+          </header>
+          
+          <div class="action-buttons">
+            <button class="action-btn primary">
+              <i class="fas fa-user-plus"></i>
+              <span>Adicionar Usuário</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Desconectar</span>
+            </button>
+            <button class="action-btn">
+              <i class="fas fa-sync-alt"></i>
+              <span>Atualizar</span>
+            </button>
+          </div>
+          
+          <div class="process-table-container">
+            <div class="table-header">
+              <div class="table-title">
+                <i class="fas fa-users"></i>
+                <span>Usuários Conectados</span>
+              </div>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar usuário...">
+              </div>
+            </div>
+            <table class="process-table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Tipo</th>
+                  <th>Sessão</th>
+                  <th>Estado</th>
+                  <th>Cliente</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <span>GamerPro</span>
+                    </div>
+                  </td>
+                  <td>Local</td>
+                  <td>Console</td>
+                  <td>Ativo</td>
+                  <td>-</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, var(--accent), var(--danger));">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <span>StreamUser</span>
+                    </div>
+                  </td>
+                  <td>Remoto</td>
+                  <td>RDP-Tcp#0</td>
+                  <td>Ativo</td>
+                  <td>192.168.1.100</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="process-name">
+                      <div class="process-icon" style="background: linear-gradient(135deg, var(--success), var(--primary));">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <span>Guest</span>
+                    </div>
+                  </td>
+                  <td>Local</td>
+                  <td>Console</td>
+                  <td>Desconectado</td>
+                  <td>-</td>
+                  <td>
+                    <button class="action-btn" style="padding: 6px 12px; font-size: 12px;">
+                      <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="info-table">
+            <div class="info-title">
+              <i class="fas fa-info-circle"></i>
+              <span>Informações do Sistema</span>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Nome do PC:</span>
+                <span class="info-value">NEXUS-GAMER-PC</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Rede:</span>
+                <span class="info-value">GAMER-NET</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Usuários ativos:</span>
+                <span class="info-value">2 de 3</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tempo de atividade:</span>
+                <span class="info-value">13:03:06:18</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+  </section>
+  
+  <script>
+    // Tab selection behavior
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+          t.tabIndex = -1;
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        tab.tabIndex = 0;
+        tab.focus();
+        
+        // Show corresponding tab content
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Sidebar resource selection behavior for Performance tab
+    const resources = document.querySelectorAll('.resource');
+    resources.forEach(resource => {
+      resource.addEventListener('click', () => {
+        // Only handle resource selection in Performance tab
+        const performanceTab = document.getElementById('performance');
+        if (!performanceTab.classList.contains('active')) return;
+        
+        resources.forEach(r => {
+          r.classList.remove('selected');
+          r.setAttribute('aria-current', 'false');
+          r.tabIndex = -1;
+        });
+        resource.classList.add('selected');
+        resource.setAttribute('aria-current', 'true');
+        resource.tabIndex = 0;
+        resource.focus();
+        
+        // Update details panel based on selected resource
+        updateDetailsPanel(resource);
+      });
+    });
+    
+    // Update details panel based on selected resource
+    function updateDetailsPanel(resource) {
+      const resourceTitle = resource.querySelector('.resource-title').textContent;
+      const detailsHeader = document.querySelector('#performance .details-header h1');
+      detailsHeader.textContent = resourceTitle;
+      
+      // Hide all hardware details panels
+      const hardwareDetails = document.querySelectorAll('.hardware-details');
+      hardwareDetails.forEach(detail => {
+        detail.style.display = 'none';
+      });
+      
+      // Show the corresponding hardware details panel
+      if (resourceTitle === 'CPU') {
+        document.getElementById('cpu-details').style.display = 'block';
+      } else if (resourceTitle === 'Memória') {
+        document.getElementById('memory-details').style.display = 'block';
+      } else if (resourceTitle.includes('Disco') || resourceTitle === 'Armazenamento') {
+        document.getElementById('disk-details').style.display = 'block';
+      } else if (resourceTitle === 'GPU') {
+        document.getElementById('gpu-details').style.display = 'block';
+      }
+    }
+    
+    // Graph options behavior
+    document.querySelectorAll('.graph-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const graphOptions = option.parentElement.querySelectorAll('.graph-option');
+        graphOptions.forEach(o => {
+          o.classList.remove('active');
+        });
+        option.classList.add('active');
+      });
+    });
+    
+    // Simulate real-time graph updates
+    function updateGraph() {
+      // Update CPU graph
+      const cpuGraph = document.querySelector('#cpu-graph .cpu-line');
+      if (cpuGraph) {
+        let points = cpuGraph.getAttribute('points').split(' ');
+        points.shift();
+        const lastPoint = points[points.length - 1].split(',');
+        const x = parseFloat(lastPoint[0]) + (100 / 12);
+        const y = Math.floor(Math.random() * 150) + 50;
+        points.push(`${x},${y}`);
+        cpuGraph.setAttribute('points', points.join(' '));
+      }
+      
+      // Update Memory graph
+      const memGraph = document.querySelector('#memory-details .mem-line');
+      if (memGraph) {
+        let points = memGraph.getAttribute('points').split(' ');
+        points.shift();
+        const lastPoint = points[points.length - 1].split(',');
+        const x = parseFloat(lastPoint[0]) + (100 / 12);
+        const y = Math.floor(Math.random() * 150) + 50;
+        points.push(`${x},${y}`);
+        memGraph.setAttribute('points', points.join(' '));
+      }
+      
+      // Update GPU graph
+      const gpuGraph = document.querySelector('#gpu-details .gpu-line');
+      if (gpuGraph) {
+        let points = gpuGraph.getAttribute('points').split(' ');
+        points.shift();
+        const lastPoint = points[points.length - 1].split(',');
+        const x = parseFloat(lastPoint[0]) + (100 / 12);
+        const y = Math.floor(Math.random() * 150) + 50;
+        points.push(`${x},${y}`);
+        gpuGraph.setAttribute('points', points.join(' '));
+      }
+    }
+    
+    // Update graph every 2 seconds
+    setInterval(updateGraph, 2000);
+    
+    // Simulate updating stats
+    function updateStats() {
+      // Update CPU stats
+      const cpuUsage = document.querySelector('#cpu-details .stat-value');
+      if (cpuUsage) {
+        const currentCpu = parseFloat(cpuUsage.textContent);
+        const newCpu = Math.max(0, Math.min(100, currentCpu + (Math.random() * 4 - 2)));
+        cpuUsage.innerHTML = `${newCpu.toFixed(1)}<span class="stat-unit">%</span>`;
+      }
+      
+      const cpuSpeed = document.querySelectorAll('#cpu-details .stat-value')[1];
+      if (cpuSpeed) {
+        const currentSpeed = parseFloat(cpuSpeed.textContent);
+        const newSpeed = Math.max(1.2, Math.min(5.0, currentSpeed + (Math.random() * 0.1 - 0.05)));
+        cpuSpeed.innerHTML = `${newSpeed.toFixed(2)}<span class="stat-unit">GHz</span>`;
+      }
+      
+      // Update Memory stats
+      const memUsage = document.querySelector('#memory-details .stat-value');
+      if (memUsage) {
+        const currentMem = parseFloat(memUsage.textContent);
+        const newMem = Math.max(5, Math.min(25, currentMem + (Math.random() * 0.2 - 0.1)));
+        memUsage.innerHTML = `${newMem.toFixed(1)}<span class="stat-unit">GB</span>`;
+        
+        // Update memory usage bar
+        const memBar = document.querySelector('#memory-details .memory-usage-fill');
+        if (memBar) {
+          const memPercent = Math.round((newMem / 32) * 100);
+          memBar.style.width = `${memPercent}%`;
+          
+          // Update memory usage text
+          const memText = document.querySelector('#memory-details .memory-usage-text');
+          if (memText) {
+            memText.textContent = `${newMem.toFixed(1)} GB de 32 GB em uso (${memPercent}%)`;
+          }
+        }
+      }
+      
+      // Update GPU stats
+      const gpuUsage = document.querySelector('#gpu-details .gpu-stat-value');
+      if (gpuUsage) {
+        const currentGpu = parseFloat(gpuUsage.textContent);
+        const newGpu = Math.max(0, Math.min(100, currentGpu + (Math.random() * 4 - 2)));
+        gpuUsage.textContent = `${newGpu.toFixed(0)}%`;
+        
+        // Update GPU usage bar
+        const gpuBar = document.querySelector('#gpu-details .gpu-stat-fill');
+        if (gpuBar) {
+          gpuBar.style.width = `${newGpu}%`;
+        }
+      }
+      
+      // Update header stats
+      const headerCpu = document.getElementById('headerCpu');
+      if (headerCpu) {
+        const currentCpu = parseFloat(headerCpu.textContent);
+        const newCpu = Math.max(0, Math.min(100, currentCpu + (Math.random() * 2 - 1)));
+        headerCpu.textContent = `${newCpu.toFixed(0)}%`;
+      }
+      
+      const headerMem = document.getElementById('headerMem');
+      if (headerMem) {
+        const currentMem = parseFloat(headerMem.textContent);
+        const newMem = Math.max(0, Math.min(100, currentMem + (Math.random() * 2 - 1)));
+        headerMem.textContent = `${newMem.toFixed(0)}%`;
+      }
+      
+      const headerGpu = document.getElementById('headerGpu');
+      if (headerGpu) {
+        const currentGpu = parseFloat(headerGpu.textContent);
+        const newGpu = Math.max(0, Math.min(100, currentGpu + (Math.random() * 4 - 2)));
+        headerGpu.textContent = `${newGpu.toFixed(0)}%`;
+      }
+    }
+    
+    // Update stats every 3 seconds
+    setInterval(updateStats, 3000);
+    
+    // Simulate updating resource subtitles
+    function updateResourceSubtitles() {
+      const resourceSubtitles = document.querySelectorAll('.resource-subtitle');
+      
+      // Update CPU subtitle
+      const cpuSubtitle = resourceSubtitles[0];
+      if (cpuSubtitle) {
+        const cpuUsage = document.querySelector('#cpu-details .stat-value');
+        const cpuSpeed = document.querySelectorAll('#cpu-details .stat-value')[1];
+        if (cpuUsage && cpuSpeed) {
+          cpuSubtitle.textContent = `${cpuUsage.textContent} • ${cpuSpeed.textContent}`;
+        }
+      }
+      
+      // Update Memory subtitle
+      const memSubtitle = resourceSubtitles[1];
+      if (memSubtitle) {
+        const memParts = memSubtitle.textContent.split(' ');
+        const currentMem = parseFloat(memParts[0]);
+        const newMem = Math.max(5, Math.min(25, currentMem + (Math.random() * 0.2 - 0.1)));
+        const memPercent = Math.round((newMem / 32) * 100);
+        memSubtitle.textContent = `${newMem.toFixed(1)}/32 GB (${memPercent}%)`;
+      }
+      
+      // Update Disk subtitle
+      const diskSubtitle = resourceSubtitles[2];
+      if (diskSubtitle) {
+        const diskUsage = Math.floor(Math.random() * 5);
+        diskSubtitle.textContent = `SSD ${diskUsage}%`;
+      }
+      
+      // Update GPU subtitle
+      const gpuSubtitle = resourceSubtitles[3];
+      if (gpuSubtitle) {
+        const gpuUsage = Math.floor(Math.random() * 15);
+        const gpuTemp = Math.floor(Math.random() * 10) + 30;
+        gpuSubtitle.textContent = `RTX 3080 Ti ${gpuUsage}% (${gpuTemp} °C)`;
+      }
+    }
+    
+    // Update resource subtitles every 4 seconds
+    setInterval(updateResourceSubtitles, 4000);
+    
+    // Process table search
+    const searchInputs = document.querySelectorAll('.search-box input');
+    searchInputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const tableRows = e.target.closest('.process-table-container').querySelectorAll('.process-table tbody tr');
+        
+        tableRows.forEach(row => {
+          const processName = row.querySelector('.process-name span').textContent.toLowerCase();
+          if (processName.includes(searchTerm)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+    
+    // Action buttons
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const btnText = btn.querySelector('span');
+        if (btnText) {
+          console.log(`Ação: ${btnText.textContent}`);
+        }
+      });
+    });
+    
+    // Footer link
+    document.querySelector('.footer-link').addEventListener('click', () => {
+      console.log('Abrir Monitor de Recursos');
+    });
+  </script>
+</body>
+</html>

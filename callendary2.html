@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus Calendar - Agenda Gamer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #e2e8f0;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --rgb-red: #ff006e;
+      --rgb-green: #00ff88;
+      --rgb-blue: #00d9ff;
+      --neon-purple: #bf00ff;
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff0080;
+      
+      /* Calendar specific colors */
+      --calendar-day-bg: rgba(15, 23, 42, 0.5);
+      --calendar-day-hover: rgba(99, 102, 241, 0.2);
+      --calendar-selected: rgba(99, 102, 241, 0.5);
+      --calendar-today: rgba(99, 102, 241, 0.3);
+      --calendar-holiday: #ff6e40;
+      --calendar-event: rgba(139, 92, 246, 0.3);
+      --calendar-weekend: rgba(236, 72, 153, 0.3);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .glass-light {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes rgbPulse {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .animate-rgb {
+      animation: rgbPulse 3s linear infinite;
+    }
+    
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .animate-rotate {
+      animation: rotate 20s linear infinite;
+    }
+    
+    /* Main container */
+    .app-container {
+      width: 100%;
+      height: 100vh;
+      background: rgba(2, 2, 23, 0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: 0;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    .app-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+    
+    .date-display {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .current-date {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .current-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    /* App Content */
+    .app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: rgba(15, 23, 42, 0.5);
+      color: var(--light);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) transparent;
+      border-right: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* New event button */
+    .new-event {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 24px;
+      cursor: pointer;
+      padding: 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .new-event:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    }
+    
+    .new-event::before {
+      content: "+";
+      font-weight: 700;
+      margin-right: 10px;
+      font-size: 20px;
+    }
+    
+    /* Month navigation in sidebar */
+    .sidebar-month {
+      color: var(--light);
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+    }
+    
+    .sidebar-month .arrow {
+      font-size: 20px;
+      font-weight: 300;
+      cursor: pointer;
+      line-height: 1;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-month .arrow:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+    }
+    
+    /* Mini calendar block in sidebar */
+    .mini-calendar {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      color: var(--light);
+      font-size: 12px;
+      line-height: 1.4;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .mini-calendar-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0 8px 0;
+      margin-bottom: 8px;
+    }
+    
+    .mini-calendar-header div {
+      font-weight: 800;
+      width: 28px;
+      text-align: center;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    
+    .mini-calendar-header div:nth-child(6),
+    .mini-calendar-header div:nth-child(7) {
+      color: var(--accent);
+    }
+    
+    /* Days */
+    .mini-calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 28px);
+      padding: 0 4px 8px 4px;
+      justify-content: center;
+    }
+    
+    .mini-day {
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--light);
+      transition: all 0.2s ease;
+    }
+    
+    .mini-day.inactive {
+      color: var(--gray);
+    }
+    
+    .mini-day.today {
+      background: var(--calendar-today);
+      font-weight: 700;
+      color: var(--primary);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    
+    .mini-day.selected {
+      background: var(--calendar-selected);
+      color: white;
+      font-weight: 600;
+    }
+    
+    .mini-day.weekend {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .mini-day:hover:not(.inactive):not(.today) {
+      background: rgba(99, 102, 241, 0.2);
+    }
+    
+    /* Calendar categories */
+    .calendar-categories {
+      margin-top: 20px;
+    }
+    
+    .category-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .category-title i {
+      color: var(--primary);
+    }
+    
+    .calendar-list {
+      font-size: 14px;
+      color: var(--light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .calendar-list:hover {
+      background: rgba(99, 102, 241, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .calendar-list i {
+      width: 20px;
+      text-align: center;
+    }
+    
+    /* Main content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--dark);
+    }
+    
+    /* Top toolbar */
+    .main-toolbar {
+      display: flex;
+      padding: 16px 20px;
+      align-items: center;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      gap: 16px;
+    }
+    
+    .search-box {
+      flex-grow: 1;
+      position: relative;
+      max-width: 400px;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding: 10px 16px 10px 44px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      font-size: 14px;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .search-box i {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translateY(-50%);
+      color: var(--gray);
+      pointer-events: none;
+    }
+    
+    /* Month navigation arrows */
+    .month-nav {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .month-nav button {
+      border: none;
+      background: rgba(99, 102, 241, 0.1);
+      font-size: 20px;
+      color: var(--light);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+    }
+    
+    .month-nav button:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    
+    /* Month label */
+    .month-label {
+      font-family: 'Orbitron', monospace;
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--primary);
+      margin: 0 16px;
+      text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+    }
+    
+    /* View switch buttons */
+    .view-switch {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .view-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .view-button:hover {
+      background: rgba(99, 102, 241, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .view-button.active {
+      background: var(--calendar-selected);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+    
+    /* Calendar wrapper */
+    .calendar-wrapper {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    /* Weekday header row */
+    .weekday-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 8px;
+      color: var(--gray);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0 8px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    
+    .weekday-row div:nth-child(1),
+    .weekday-row div:nth-child(7) {
+      color: var(--accent);
+    }
+    
+    /* Date row */
+    .date-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    /* Date cell styling */
+    .date-cell {
+      background: var(--calendar-day-bg);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 12px;
+      position: relative;
+      cursor: pointer;
+      min-height: 120px;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+    
+    .date-cell:hover {
+      background: var(--calendar-day-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .date-cell.weekend {
+      border-color: rgba(236, 72, 153, 0.3);
+    }
+    
+    /* Date number */
+    .date-cell .date-number {
+      font-weight: 700;
+      color: var(--light);
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      border-radius: 50%;
+    }
+    
+    /* Dates from previous/next month */
+    .date-cell.inactive .date-number {
+      color: var(--gray);
+    }
+    
+    /* Highlight for selected day */
+    .date-cell.selected .date-number {
+      background: var(--calendar-selected);
+      color: white;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+    }
+    
+    /* Today highlight */
+    .date-cell.today .date-number {
+      background: var(--calendar-today);
+      color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+    }
+    
+    /* Event container */
+    .event {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .event:hover {
+      transform: translateX(3px);
+    }
+    
+    /* Holiday event style */
+    .event.holiday {
+      background: rgba(255, 110, 64, 0.2);
+      color: var(--calendar-holiday);
+      font-weight: 600;
+      border-left: 3px solid var(--calendar-holiday);
+    }
+    
+    /* Regular event style */
+    .event.regular {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--secondary);
+      font-weight: 600;
+      border-left: 3px solid var(--secondary);
+    }
+    
+    /* Gaming event style */
+    .event.gaming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+      font-weight: 600;
+      border-left: 3px solid var(--neon-blue);
+    }
+    
+    /* Stream event style */
+    .event.stream {
+      background: rgba(236, 72, 153, 0.2);
+      color: var(--accent);
+      font-weight: 600;
+      border-left: 3px solid var(--accent);
+    }
+    
+    /* Event dialog */
+    .event-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      padding: 24px;
+      width: 90%;
+      max-width: 500px;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .event-dialog.active {
+      display: flex;
+    }
+    
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      padding-bottom: 16px;
+    }
+    
+    .dialog-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .dialog-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 18px;
+    }
+    
+    .dialog-close:hover {
+      background: rgba(239, 68, 68, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .dialog-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--light);
+    }
+    
+    .form-input,
+    .form-select {
+      padding: 12px 16px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--light);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-secondary {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(99, 102, 241, 0.3);
+    }
+    
+    /* Dialog overlay */
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      display: none;
+    }
+    
+    .dialog-overlay.active {
+      display: block;
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      color: var(--light);
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      max-width: 300px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .tooltip.active {
+      opacity: 1;
+    }
+    
+    .tooltip-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 16px;
+      color: var(--primary);
+    }
+    
+    .tooltip-content {
+      line-height: 1.5;
+    }
+    
+    .tooltip-event {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .tooltip-event-title {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .tooltip-event-time {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+    
+    /* Search results */
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .search-results.active {
+      display: block;
+    }
+    
+    .search-result-item {
+      padding: 16px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    
+    .search-result-item:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .search-result-title {
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .search-result-date {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    .search-result-type {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .search-result-type.holiday {
+      background: rgba(255, 110, 64, 0.2);
+      color: var(--calendar-holiday);
+    }
+    
+    .search-result-type.event {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--secondary);
+    }
+    
+    .search-result-type.gaming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+    }
+    
+    .search-result-type.stream {
+      background: rgba(236, 72, 153, 0.2);
+      color: var(--accent);
+    }
+    
+    /* Month view */
+    .month-view {
+      display: none;
+    }
+    
+    .month-view.active {
+      display: block;
+    }
+    
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      background: transparent;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .month-cell {
+      background: var(--calendar-day-bg);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      min-height: 120px;
+      padding: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+    
+    .month-cell:hover {
+      background: var(--calendar-day-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .month-cell.other-month {
+      opacity: 0.5;
+    }
+    
+    .month-cell.today {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+    
+    .month-cell.selected {
+      background: var(--calendar-selected);
+      color: white;
+    }
+    
+    .month-cell-number {
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    
+    .month-cell-events {
+      font-size: 11px;
+    }
+    
+    .month-cell-event {
+      margin-bottom: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .month-cell-event.holiday {
+      background: rgba(255, 110, 64, 0.2);
+      color: var(--calendar-holiday);
+    }
+    
+    .month-cell-event.regular {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--secondary);
+    }
+    
+    .month-cell-event.gaming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+    }
+    
+    .month-cell-event.stream {
+      background: rgba(236, 72, 153, 0.2);
+      color: var(--accent);
+    }
+    
+    /* Event type badges */
+    .event-type-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
+    
+    .event-type-badge.gaming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+    }
+    
+    .event-type-badge.stream {
+      background: rgba(236, 72, 153, 0.2);
+      color: var(--accent);
+    }
+    
+    /* Gaming elements */
+    .gaming-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .gaming-stat {
+      text-align: center;
+    }
+    
+    .gaming-stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    
+    .gaming-stat-label {
+      font-size: 12px;
+      color: var(--gray);
+      text-transform: uppercase;
+    }
+    
+    /* Floating action button */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+      transition: all 0.3s ease;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.7);
+    }
+    
+    /* Quick event categories */
+    .quick-event-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .quick-event-category {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .quick-event-category:hover {
+      transform: translateY(-2px);
+    }
+    
+    .quick-event-category.gaming {
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--neon-blue);
+    }
+    
+    .quick-event-category.stream {
+      background: rgba(236, 72, 153, 0.2);
+      color: var(--accent);
+    }
+    
+    .quick-event-category.work {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+    }
+    
+    .quick-event-category.personal {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 240px;
+      }
+      
+      .date-cell {
+        min-height: 80px;
+        padding: 8px;
+      }
+      
+      .event {
+        font-size: 10px;
+        margin-top: 4px;
+        padding: 2px 4px;
+      }
+      
+      .month-cell {
+        min-height: 80px;
+        padding: 8px;
+      }
+      
+      .gaming-stats {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon animate-glow">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="app-title">NEXUS CALENDAR</div>
+      </div>
+      
+      <div class="date-display">
+        <div class="current-date" id="currentDate">Segunda-feira, 15 de maio de 2023</div>
+        <div class="current-time" id="currentTime">14:30:45</div>
+      </div>
+    </header>
+    
+    <!-- App Content -->
+    <div class="app-content">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="new-event" id="newEventBtn">Novo Evento</div>
+        
+        <div class="sidebar-month">
+          <span id="sidebarMonthLabel">maio de 2023</span>
+          <div>
+            <span class="arrow" id="prevMonthBtn">‹</span>
+            <span class="arrow" id="nextMonthBtn">›</span>
+          </div>
+        </div>
+        
+        <div class="mini-calendar" id="miniCalendar">
+          <div class="mini-calendar-header">
+            <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+          </div>
+          <div class="mini-calendar-days" id="miniCalendarDays">
+            <!-- Mini calendar days will be generated here -->
+          </div>
+        </div>
+        
+        <div class="calendar-categories">
+          <div class="category-title">
+            <i class="fas fa-layer-group"></i>
+            <span>Categorias</span>
+          </div>
+          
+          <div class="calendar-list">
+            <i class="fas fa-gamepad" style="color: var(--neon-blue);"></i>
+            <span>Gaming</span>
+          </div>
+          
+          <div class="calendar-list">
+            <i class="fas fa-video" style="color: var(--accent);"></i>
+            <span>Stream</span>
+          </div>
+          
+          <div class="calendar-list">
+            <i class="fas fa-briefcase" style="color: var(--primary);"></i>
+            <span>Trabalho</span>
+          </div>
+          
+          <div class="calendar-list">
+            <i class="fas fa-user" style="color: var(--success);"></i>
+            <span>Pessoal</span>
+          </div>
+        </div>
+        
+        <div class="quick-event-categories">
+          <div class="quick-event-category gaming" data-category="gaming">
+            <i class="fas fa-gamepad"></i>
+            <span>Adicionar Jogo</span>
+          </div>
+          
+          <div class="quick-event-category stream" data-category="stream">
+            <i class="fas fa-video"></i>
+            <span>Agendar Stream</span>
+          </div>
+        </div>
+        
+        <div class="gaming-stats">
+          <div class="gaming-stat">
+            <div class="gaming-stat-value" id="gamingEventsCount">3</div>
+            <div class="gaming-stat-label">Eventos Gaming</div>
+          </div>
+          
+          <div class="gaming-stat">
+            <div class="gaming-stat-value" id="streamEventsCount">2</div>
+            <div class="gaming-stat-label">Streams</div>
+          </div>
+          
+          <div class="gaming-stat">
+            <div class="gaming-stat-value" id="upcomingEventsCount">5</div>
+            <div class="gaming-stat-label">Próximos</div>
+          </div>
+        </div>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="main">
+        <div class="main-toolbar">
+          <div class="search-box">
+            <input type="search" placeholder="Pesquisar eventos e feriados" id="searchInput">
+            <i class="fas fa-search"></i>
+            <div class="search-results" id="searchResults"></div>
+          </div>
+          
+          <div class="month-nav">
+            <button id="mainPrevMonthBtn">‹</button>
+            <button id="mainNextMonthBtn">›</button>
+          </div>
+          
+          <div class="month-label" id="mainMonthLabel">maio de 2023</div>
+          
+          <div class="view-switch">
+            <button class="view-button active" id="weekViewBtn">
+              <i class="fas fa-calendar-week"></i>
+              <span>Semanal</span>
+            </button>
+            <button class="view-button" id="monthViewBtn">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Mensal</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="calendar-wrapper">
+          <!-- Week View -->
+          <div id="weekView" class="week-view">
+            <div class="weekday-row">
+              <div>domingo</div>
+              <div>segunda-feira</div>
+              <div>terça-feira</div>
+              <div>quarta-feira</div>
+              <div>quinta-feira</div>
+              <div>sexta-feira</div>
+              <div>sábado</div>
+            </div>
+            
+            <div id="calendarDays">
+              <!-- Calendar days will be generated here -->
+            </div>
+          </div>
+          
+          <!-- Month View -->
+          <div id="monthView" class="month-view">
+            <div class="month-grid" id="monthGrid">
+              <!-- Month grid will be generated here -->
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Floating Action Button -->
+  <button class="fab" id="fabBtn">
+    <i class="fas fa-plus"></i>
+  </button>
+  
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip">
+    <div class="tooltip-title" id="tooltipTitle"></div>
+    <div class="tooltip-content" id="tooltipContent"></div>
+    <div id="tooltipEvents"></div>
+  </div>
+  
+  <!-- Event Dialog -->
+  <div class="dialog-overlay" id="dialogOverlay"></div>
+  
+  <div class="event-dialog" id="eventDialog">
+    <div class="dialog-header">
+      <div class="dialog-title" id="dialogTitle">Novo Evento</div>
+      <button class="dialog-close" id="dialogCloseBtn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="dialog-content">
+      <div class="form-group">
+        <label class="form-label" for="eventTitle">Título</label>
+        <input type="text" class="form-input" id="eventTitle" placeholder="Título do evento">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="eventCategory">Categoria</label>
+        <select class="form-select" id="eventCategory">
+          <option value="regular">Regular</option>
+          <option value="gaming">Gaming</option>
+          <option value="stream">Stream</option>
+          <option value="work">Trabalho</option>
+          <option value="personal">Pessoal</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="eventDate">Data</label>
+        <input type="date" class="form-input" id="eventDate">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="eventTime">Horário</label>
+        <input type="time" class="form-input" id="eventTime">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="eventDescription">Descrição</label>
+        <textarea class="form-input form-textarea" id="eventDescription" placeholder="Descrição do evento"></textarea>
+      </div>
+    </div>
+    
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+      <button class="btn btn-primary" id="saveBtn">Salvar</button>
+    </div>
+  </div>
+  
+  <script>
+    // Calendar state
+    let currentDate = new Date();
+    let selectedDate = new Date();
+    let events = [];
+    let holidays = [];
+    let viewMode = 'week'; // week, month
+    let notifications = [];
+    
+    // Initialize calendar
+    document.addEventListener('DOMContentLoaded', () => {
+      loadEventsFromStorage();
+      loadNotificationsFromStorage();
+      fetchHolidays(currentDate.getFullYear());
+      requestNotificationPermission();
+      renderCalendar();
+      renderMiniCalendar();
+      updateDateTime();
+      setupEventListeners();
+      checkNotifications();
+      updateGamingStats();
+    });
+    
+    // Update date and time
+    function updateDateTime() {
+      const now = new Date();
+      
+      // Update current date
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const dateString = now.toLocaleDateString('pt-BR', options);
+      document.getElementById('currentDate').textContent = dateString;
+      
+      // Update current time
+      const timeString = now.toLocaleTimeString('pt-BR');
+      document.getElementById('currentTime').textContent = timeString;
+      
+      // Update every second
+      setTimeout(updateDateTime, 1000);
+    }
+    
+    // Request notification permission
+    function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+    
+    // Load events from localStorage
+    function loadEventsFromStorage() {
+      const savedEvents = localStorage.getItem('nexusCalendarEvents');
+      if (savedEvents) {
+        events = JSON.parse(savedEvents);
+      }
+    }
+    
+    // Load notifications from localStorage
+    function loadNotificationsFromStorage() {
+      const savedNotifications = localStorage.getItem('nexusCalendarNotifications');
+      if (savedNotifications) {
+        notifications = JSON.parse(savedNotifications);
+      }
+    }
+    
+    // Save events to localStorage
+    function saveEventsToStorage() {
+      localStorage.setItem('nexusCalendarEvents', JSON.stringify(events));
+    }
+    
+    // Save notifications to localStorage
+    function saveNotificationsToStorage() {
+      localStorage.setItem('nexusCalendarNotifications', JSON.stringify(notifications));
+    }
+    
+    // Update gaming stats
+    function updateGamingStats() {
+      const gamingEvents = events.filter(e => e.category === 'gaming').length;
+      const streamEvents = events.filter(e => e.category === 'stream').length;
+      const upcomingEvents = events.filter(e => {
+        const eventDate = new Date(e.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return eventDate >= today;
+      }).length;
+      
+      document.getElementById('gamingEventsCount').textContent = gamingEvents;
+      document.getElementById('streamEventsCount').textContent = streamEvents;
+      document.getElementById('upcomingEventsCount').textContent = upcomingEvents;
+    }
+    
+    // Fetch holidays from API
+    function fetchHolidays(year) {
+      fetch(`https://brasilapi.com.br/api/feriados/v1/${year}`)
+        .then(response => response.json())
+        .then(data => {
+          holidays = data;
+          renderCalendar();
+          renderMiniCalendar();
+        })
+        .catch(error => {
+          console.error('Erro ao buscar feriados:', error);
+        });
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Month navigation
+      document.getElementById('prevMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+        renderMiniCalendar();
+      });
+      
+      document.getElementById('nextMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+        renderMiniCalendar();
+      });
+      
+      document.getElementById('mainPrevMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+        renderMiniCalendar();
+      });
+      
+      document.getElementById('mainNextMonthBtn').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+        renderMiniCalendar();
+      });
+      
+      // View mode buttons
+      document.getElementById('weekViewBtn').addEventListener('click', () => {
+        setViewMode('week');
+      });
+      
+      document.getElementById('monthViewBtn').addEventListener('click', () => {
+        setViewMode('month');
+      });
+      
+      // New event buttons
+      document.getElementById('newEventBtn').addEventListener('click', () => {
+        openEventDialog();
+      });
+      
+      document.getElementById('fabBtn').addEventListener('click', () => {
+        openEventDialog();
+      });
+      
+      // Quick event categories
+      document.querySelectorAll('.quick-event-category').forEach(category => {
+        category.addEventListener('click', () => {
+          const categoryType = category.dataset.category;
+          openEventDialog(null, categoryType);
+        });
+      });
+      
+      // Event dialog
+      document.getElementById('dialogCloseBtn').addEventListener('click', closeEventDialog);
+      document.getElementById('cancelBtn').addEventListener('click', closeEventDialog);
+      document.getElementById('saveBtn').addEventListener('click', saveEvent);
+      
+      // Dialog overlay
+      document.getElementById('dialogOverlay').addEventListener('click', closeEventDialog);
+      
+      // Search functionality
+      const searchInput = document.getElementById('searchInput');
+      const searchResults = document.getElementById('searchResults');
+      
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query.length > 0) {
+          const results = searchEventsAndHolidays(query);
+          displaySearchResults(results);
+          searchResults.classList.add('active');
+        } else {
+          searchResults.classList.remove('active');
+        }
+      });
+      
+      // Hide search results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-box')) {
+          searchResults.classList.remove('active');
+        }
+      });
+    }
+    
+    // Set view mode
+    function setViewMode(mode) {
+      viewMode = mode;
+      
+      // Update view buttons
+      document.querySelectorAll('.view-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      if (mode === 'week') {
+        document.getElementById('weekViewBtn').classList.add('active');
+        document.getElementById('weekView').style.display = 'block';
+        document.getElementById('monthView').style.display = 'none';
+      } else if (mode === 'month') {
+        document.getElementById('monthViewBtn').classList.add('active');
+        document.getElementById('weekView').style.display = 'none';
+        document.getElementById('monthView').style.display = 'block';
+        renderMonthView();
+      }
+    }
+    
+    // Render calendar
+    function renderCalendar() {
+      // Update month labels
+      const monthNames = [
+        'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+        'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+      ];
+      
+      const monthYear = `${monthNames[currentDate.getMonth()]} de ${currentDate.getFullYear()}`;
+      document.getElementById('sidebarMonthLabel').textContent = monthYear;
+      document.getElementById('mainMonthLabel').textContent = monthYear;
+      
+      if (viewMode === 'week') {
+        renderWeekView();
+      } else {
+        renderMonthView();
+      }
+    }
+    
+    // Render week view
+    function renderWeekView() {
+      // Clear calendar days
+      const calendarDays = document.getElementById('calendarDays');
+      calendarDays.innerHTML = '';
+      
+      // Get current week
+      const startOfWeek = new Date(currentDate);
+      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+      
+      // Create date rows
+      for (let i = 0; i < 1; i++) {
+        const dateRow = document.createElement('div');
+        dateRow.className = 'date-row';
+        
+        // Create 7 cells for each day of the week
+        for (let j = 0; j < 7; j++) {
+          const dateCell = document.createElement('div');
+          dateCell.className = 'date-cell';
+          
+          // Add weekend class
+          if (j === 0 || j === 6) {
+            dateCell.classList.add('weekend');
+          }
+          
+          const cellDate = new Date(startOfWeek);
+          cellDate.setDate(startOfWeek.getDate() + j);
+          const dateString = formatDate(cellDate);
+          
+          const dateNumber = document.createElement('div');
+          dateNumber.className = 'date-number';
+          dateNumber.textContent = cellDate.getDate();
+          dateCell.appendChild(dateNumber);
+          
+          // Check if today
+          const today = new Date();
+          if (cellDate.toDateString() === today.toDateString()) {
+            dateCell.classList.add('today');
+          }
+          
+          // Check if selected
+          if (cellDate.toDateString() === selectedDate.toDateString()) {
+            dateCell.classList.add('selected');
+          }
+          
+          // Add holidays
+          const holiday = holidays.find(h => h.date === dateString);
+          if (holiday) {
+            const holidayEvent = document.createElement('div');
+            holidayEvent.className = 'event holiday';
+            holidayEvent.textContent = holiday.name;
+            holidayEvent.title = holiday.name;
+            dateCell.appendChild(holidayEvent);
+          }
+          
+          // Add events
+          const dayEvents = events.filter(e => e.date === dateString);
+          dayEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = `event ${event.category || 'regular'}`;
+            eventElement.textContent = event.title;
+            eventElement.title = event.title;
+            
+            // Add event type badge for special categories
+            if (event.category === 'gaming' || event.category === 'stream') {
+              const badge = document.createElement('span');
+              badge.className = `event-type-badge ${event.category}`;
+              badge.textContent = event.category;
+              eventElement.appendChild(badge);
+            }
+            
+            eventElement.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openEventDialog(event);
+            });
+            dateCell.appendChild(eventElement);
+          });
+          
+          // Add click event to date cell
+          dateCell.addEventListener('click', (e) => {
+            if (e.target === dateCell || e.target.classList.contains('date-number')) {
+              selectedDate = new Date(cellDate);
+              showDayInfo(cellDate, dateCell);
+              renderCalendar();
+              renderMiniCalendar();
+            }
+          });
+          
+          dateRow.appendChild(dateCell);
+        }
+        
+        calendarDays.appendChild(dateRow);
+      }
+    }
+    
+    // Render month view
+    function renderMonthView() {
+      const monthGrid = document.getElementById('monthGrid');
+      monthGrid.innerHTML = '';
+      
+      // Add weekday headers
+      const weekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+      weekdays.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'month-cell';
+        header.style.fontWeight = 'bold';
+        header.style.textAlign = 'center';
+        header.style.background = 'rgba(99, 102, 241, 0.1)';
+        header.style.padding = '12px 8px';
+        header.textContent = day;
+        
+        // Highlight weekends
+        if (day === 'D' || day === 'S') {
+          header.style.color = 'var(--accent)';
+        }
+        
+        monthGrid.appendChild(header);
+      });
+      
+      // Get first day of month and number of days
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+      
+      // Get previous month's last days
+      const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+      const daysInPrevMonth = prevMonthLastDay.getDate();
+      
+      // Create month cells
+      let date = 1;
+      let nextMonthDate = 1;
+      
+      // Create 6 rows to cover all possibilities
+      for (let i = 0; i < 6; i++) {
+        // Create 7 cells for each day of the week
+        for (let j = 0; j < 7; j++) {
+          const monthCell = document.createElement('div');
+          monthCell.className = 'month-cell';
+          
+          // Highlight weekends
+          if (j === 0 || j === 6) {
+            monthCell.style.borderColor = 'rgba(236, 72, 153, 0.3)';
+          }
+          
+          if (i === 0 && j < startingDayOfWeek) {
+            // Previous month's days
+            const prevDate = daysInPrevMonth - startingDayOfWeek + j + 1;
+            monthCell.classList.add('other-month');
+            monthCell.innerHTML = `<div class="month-cell-number">${prevDate}</div>`;
+          } else if (date > daysInMonth) {
+            // Next month's days
+            monthCell.classList.add('other-month');
+            monthCell.innerHTML = `<div class="month-cell-number">${nextMonthDate}</div>`;
+            nextMonthDate++;
+          } else {
+            // Current month's days
+            const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+            const dateString = formatDate(cellDate);
+            
+            monthCell.innerHTML = `<div class="month-cell-number">${date}</div>`;
+            
+            // Check if today
+            const today = new Date();
+            if (cellDate.toDateString() === today.toDateString()) {
+              monthCell.classList.add('today');
+            }
+            
+            // Check if selected
+            if (cellDate.toDateString() === selectedDate.toDateString()) {
+              monthCell.classList.add('selected');
+            }
+            
+            // Add events container
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'month-cell-events';
+            
+            // Add holidays
+            const holiday = holidays.find(h => h.date === dateString);
+            if (holiday) {
+              const holidayEvent = document.createElement('div');
+              holidayEvent.className = 'month-cell-event holiday';
+              holidayEvent.textContent = holiday.name;
+              holidayEvent.title = holiday.name;
+              eventsContainer.appendChild(holidayEvent);
+            }
+            
+            // Add events (limit to 3 for space)
+            const dayEvents = events.filter(e => e.date === dateString);
+            dayEvents.slice(0, 3).forEach(event => {
+              const eventElement = document.createElement('div');
+              eventElement.className = `month-cell-event ${event.category || 'regular'}`;
+              eventElement.textContent = event.title;
+              eventElement.title = event.title;
+              eventsContainer.appendChild(eventElement);
+            });
+            
+            if (dayEvents.length > 3) {
+              const moreEvents = document.createElement('div');
+              moreEvents.className = 'month-cell-event';
+              moreEvents.textContent = `+${dayEvents.length - 3} mais`;
+              moreEvents.style.fontStyle = 'italic';
+              eventsContainer.appendChild(moreEvents);
+            }
+            
+            monthCell.appendChild(eventsContainer);
+            
+            // Add click event
+            monthCell.addEventListener('click', () => {
+              selectedDate = new Date(cellDate);
+              showDayInfo(cellDate, monthCell);
+              renderCalendar();
+              renderMiniCalendar();
+            });
+            
+            date++;
+          }
+          
+          monthGrid.appendChild(monthCell);
+        }
+        
+        // Break if we've displayed all days of the month
+        if (date > daysInMonth) {
+          break;
+        }
+      }
+    }
+    
+    // Render mini calendar
+    function renderMiniCalendar() {
+      const miniCalendarDays = document.getElementById('miniCalendarDays');
+      miniCalendarDays.innerHTML = '';
+      
+      // Get first day of month and number of days
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
+      
+      // Get previous month's last days
+      const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+      const daysInPrevMonth = prevMonthLastDay.getDate();
+      
+      // Create mini calendar days
+      let date = 1;
+      let nextMonthDate = 1;
+      
+      // Create 6 rows to cover all possibilities
+      for (let i = 0; i < 6; i++) {
+        // Create 7 cells for each day of the week
+        for (let j = 0; j < 7; j++) {
+          const miniDay = document.createElement('div');
+          miniDay.className = 'mini-day';
+          
+          if (i === 0 && j < startingDayOfWeek) {
+            // Previous month's days
+            const prevDate = daysInPrevMonth - startingDayOfWeek + j + 1;
+            miniDay.classList.add('inactive');
+            miniDay.textContent = prevDate;
+          } else if (date > daysInMonth) {
+            // Next month's days
+            miniDay.classList.add('inactive');
+            miniDay.textContent = nextMonthDate;
+            nextMonthDate++;
+          } else {
+            // Current month's days
+            const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+            
+            // Check if today
+            const today = new Date();
+            if (cellDate.toDateString() === today.toDateString()) {
+              miniDay.classList.add('today');
+            }
+            
+            // Check if selected
+            if (cellDate.toDateString() === selectedDate.toDateString()) {
+              miniDay.classList.add('selected');
+            }
+            
+            // Check if weekend
+            if (j === 0 || j === 6) {
+              miniDay.classList.add('weekend');
+            }
+            
+            miniDay.textContent = date;
+            
+            // Add click event
+            miniDay.addEventListener('click', () => {
+              selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), date);
+              renderCalendar();
+              renderMiniCalendar();
+            });
+            
+            date++;
+          }
+          
+          miniCalendarDays.appendChild(miniDay);
+        }
+        
+        // Break if we've displayed all days of the month
+        if (date > daysInMonth) {
+          break;
+        }
+      }
+    }
+    
+    // Show day info tooltip
+    function showDayInfo(date, element) {
+      const tooltip = document.getElementById('tooltip');
+      const tooltipTitle = document.getElementById('tooltipTitle');
+      const tooltipContent = document.getElementById('tooltipContent');
+      const tooltipEvents = document.getElementById('tooltipEvents');
+      
+      const dateString = formatDate(date);
+      const dayName = date.toLocaleDateString('pt-BR', { weekday: 'long' });
+      const formattedDate = date.toLocaleDateString('pt-BR');
+      
+      tooltipTitle.textContent = `${dayName}, ${formattedDate}`;
+      
+      let content = '';
+      
+      // Check if today
+      const today = new Date();
+      if (date.toDateString() === today.toDateString()) {
+        content += 'Hoje<br>';
+      }
+      
+      // Check for holidays
+      const holiday = holidays.find(h => h.date === dateString);
+      if (holiday) {
+        content += `<strong>Feriado:</strong> ${holiday.name}<br>`;
+      }
+      
+      // Check for events
+      const dayEvents = events.filter(e => e.date === dateString);
+      if (dayEvents.length > 0) {
+        content += `<strong>${dayEvents.length} evento(s):</strong><br>`;
+      } else {
+        content += 'Nenhum evento agendado';
+      }
+      
+      tooltipContent.innerHTML = content;
+      
+      // Clear and populate events
+      tooltipEvents.innerHTML = '';
+      dayEvents.forEach(event => {
+        const eventDiv = document.createElement('div');
+        eventDiv.className = 'tooltip-event';
+        
+        let eventInfo = `<div class="tooltip-event-title">${event.title}</div>`;
+        if (event.category === 'gaming') {
+          eventInfo += `<span class="event-type-badge gaming">gaming</span>`;
+        } else if (event.category === 'stream') {
+          eventInfo += `<span class="event-type-badge stream">stream</span>`;
+        }
+        
+        if (event.time) {
+          eventInfo += `<div class="tooltip-event-time">${event.time}</div>`;
+        }
+        
+        eventDiv.innerHTML = eventInfo;
+        tooltipEvents.appendChild(eventDiv);
+      });
+      
+      // Position tooltip
+      const rect = element.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + rect.width / 2}px`;
+      tooltip.style.top = `${rect.bottom + 10}px`;
+      tooltip.style.transform = 'translateX(-50%)';
+      
+      // Show tooltip
+      tooltip.classList.add('active');
+      
+      // Hide tooltip after 3 seconds
+      setTimeout(() => {
+        tooltip.classList.remove('active');
+      }, 3000);
+    }
+    
+    // Search events and holidays
+    function searchEventsAndHolidays(query) {
+      const results = [];
+      
+      // Search holidays
+      holidays.forEach(holiday => {
+        if (holiday.name.toLowerCase().includes(query)) {
+          results.push({
+            type: 'holiday',
+            title: holiday.name,
+            date: holiday.date,
+            dateString: new Date(holiday.date).toLocaleDateString('pt-BR')
+          });
+        }
+      });
+      
+      // Search events
+      events.forEach(event => {
+        if (event.title.toLowerCase().includes(query) || 
+            (event.description && event.description.toLowerCase().includes(query))) {
+          results.push({
+            type: 'event',
+            title: event.title,
+            date: event.date,
+            dateString: new Date(event.date).toLocaleDateString('pt-BR'),
+            time: event.time,
+            description: event.description,
+            category: event.category
+          });
+        }
+      });
+      
+      return results.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+    
+    // Display search results
+    function displaySearchResults(results) {
+      const searchResults = document.getElementById('searchResults');
+      searchResults.innerHTML = '';
+      
+      if (results.length === 0) {
+        searchResults.innerHTML = '<div class="search-result-item">Nenhum resultado encontrado</div>';
+        return;
+      }
+      
+      results.forEach(result => {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        
+        let typeLabel = '';
+        if (result.type === 'holiday') {
+          typeLabel = '<span class="search-result-type holiday">Feriado</span>';
+        } else if (result.category === 'gaming') {
+          typeLabel = '<span class="search-result-type gaming">Gaming</span>';
+        } else if (result.category === 'stream') {
+          typeLabel = '<span class="search-result-type stream">Stream</span>';
+        } else {
+          typeLabel = '<span class="search-result-type event">Evento</span>';
+        }
+        
+        let icon = '';
+        if (result.type === 'holiday') {
+          icon = '<i class="fas fa-star" style="color: var(--calendar-holiday);"></i>';
+        } else if (result.category === 'gaming') {
+          icon = '<i class="fas fa-gamepad" style="color: var(--neon-blue);"></i>';
+        } else if (result.category === 'stream') {
+          icon = '<i class="fas fa-video" style="color: var(--accent);"></i>';
+        } else {
+          icon = '<i class="fas fa-calendar" style="color: var(--primary);"></i>';
+        }
+        
+        item.innerHTML = `
+          <div class="search-result-title">
+            ${icon}
+            ${result.title}
+            ${typeLabel}
+          </div>
+          <div class="search-result-date">
+            ${result.dateString}
+            ${result.time ? ` às ${result.time}` : ''}
+          </div>
+        `;
+        
+        item.addEventListener('click', () => {
+          // Navigate to the date
+          currentDate = new Date(result.date);
+          selectedDate = new Date(result.date);
+          renderCalendar();
+          renderMiniCalendar();
+          
+          // Hide search results
+          searchResults.classList.remove('active');
+          document.getElementById('searchInput').value = '';
+        });
+        
+        searchResults.appendChild(item);
+      });
+    }
+    
+    // Format date as YYYY-MM-DD
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Open event dialog
+    function openEventDialog(event = null, category = 'regular') {
+      const dialog = document.getElementById('eventDialog');
+      const overlay = document.getElementById('dialogOverlay');
+      const dialogTitle = document.getElementById('dialogTitle');
+      const eventTitle = document.getElementById('eventTitle');
+      const eventCategory = document.getElementById('eventCategory');
+      const eventDate = document.getElementById('eventDate');
+      const eventTime = document.getElementById('eventTime');
+      const eventDescription = document.getElementById('eventDescription');
+      
+      if (event) {
+        // Edit existing event
+        dialogTitle.textContent = 'Editar Evento';
+        eventTitle.value = event.title;
+        eventCategory.value = event.category || 'regular';
+        eventDate.value = event.date;
+        eventTime.value = event.time || '';
+        eventDescription.value = event.description || '';
+        dialog.dataset.eventId = event.id;
+      } else {
+        // Create new event
+        dialogTitle.textContent = 'Novo Evento';
+        eventTitle.value = '';
+        eventCategory.value = category;
+        eventDate.value = formatDate(selectedDate);
+        eventTime.value = '';
+        eventDescription.value = '';
+        delete dialog.dataset.eventId;
+      }
+      
+      dialog.classList.add('active');
+      overlay.classList.add('active');
+    }
+    
+    // Close event dialog
+    function closeEventDialog() {
+      const dialog = document.getElementById('eventDialog');
+      const overlay = document.getElementById('dialogOverlay');
+      
+      dialog.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+    
+    // Save event
+    function saveEvent() {
+      const dialog = document.getElementById('eventDialog');
+      const eventTitle = document.getElementById('eventTitle').value.trim();
+      const eventCategory = document.getElementById('eventCategory').value;
+      const eventDate = document.getElementById('eventDate').value;
+      const eventTime = document.getElementById('eventTime').value;
+      const eventDescription = document.getElementById('eventDescription').value.trim();
+      
+      if (!eventTitle) {
+        showNotification('Por favor, insira um título para o evento.', 'error');
+        return;
+      }
+      
+      if (!eventDate) {
+        showNotification('Por favor, selecione uma data para o evento.', 'error');
+        return;
+      }
+      
+      const eventData = {
+        id: dialog.dataset.eventId || Date.now().toString(),
+        title: eventTitle,
+        category: eventCategory,
+        date: eventDate,
+        time: eventTime,
+        description: eventDescription
+      };
+      
+      if (dialog.dataset.eventId) {
+        // Update existing event
+        const index = events.findIndex(e => e.id === dialog.dataset.eventId);
+        if (index !== -1) {
+          events[index] = eventData;
+        }
+        showNotification('Evento atualizado com sucesso!', 'success');
+      } else {
+        // Add new event
+        events.push(eventData);
+        showNotification('Evento criado com sucesso!', 'success');
+        
+        // Schedule notification
+        if (eventTime) {
+          scheduleNotification(eventData);
+        }
+      }
+      
+      saveEventsToStorage();
+      renderCalendar();
+      updateGamingStats();
+      closeEventDialog();
+    }
+    
+    // Schedule notification
+    function scheduleNotification(event) {
+      const eventDateTime = new Date(`${event.date}T${eventTime}`);
+      const now = new Date();
+      const timeUntilEvent = eventDateTime - now;
+      
+      if (timeUntilEvent > 0) {
+        const notification = {
+          id: `notif_${event.id}`,
+          eventId: event.id,
+          title: event.title,
+          time: event.time,
+          date: event.date,
+          category: event.category,
+          scheduledFor: eventDateTime.toISOString()
+        };
+        
+        notifications.push(notification);
+        saveNotificationsToStorage();
+        
+        // Set timeout for notification
+        setTimeout(() => {
+          showNotification(event);
+          // Remove from notifications array
+          notifications = notifications.filter(n => n.id !== notification.id);
+          saveNotificationsToStorage();
+        }, timeUntilEvent);
+      }
+    }
+    
+    // Show notification
+    function showNotification(event, type = 'reminder') {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        let icon = 'calendaricon.png';
+        let badgeColor = '#6366f1';
+        
+        if (event.category === 'gaming') {
+          icon = 'gamepad-icon.png'; // This would be a real icon in production
+          badgeColor = '#00d4ff';
+        } else if (event.category === 'stream') {
+          icon = 'video-icon.png'; // This would be a real icon in production
+          badgeColor = '#ec4899';
+        }
+        
+        const notification = new Notification('Lembrete de Evento', {
+          body: `${event.title} - ${event.time}`,
+          icon: icon,
+          badge: icon,
+          tag: event.id,
+          silent: false
+        });
+        
+        notification.onclick = () => {
+          window.focus();
+          notification.close();
+        };
+      }
+      
+      // Show in-app notification
+      const message = document.createElement('div');
+      message.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        max-width: 300px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      let categoryIcon = '';
+      let categoryColor = '';
+      
+      if (event.category === 'gaming') {
+        categoryIcon = '<i class="fas fa-gamepad"></i>';
+        categoryColor = '#00d4ff';
+      } else if (event.category === 'stream') {
+        categoryIcon = '<i class="fas fa-video"></i>';
+        categoryColor = '#ec4899';
+      } else {
+        categoryIcon = '<i class="fas fa-calendar"></i>';
+        categoryColor = '#6366f1';
+      }
+      
+      message.innerHTML = `
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <div style="width: 24px; height: 24px; border-radius: 50%; background: ${categoryColor}; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+            ${categoryIcon}
+          </div>
+          <div style="font-weight: 600;">${event.title}</div>
+        </div>
+        <div style="font-size: 14px; opacity: 0.8;">
+          ${event.date} às ${event.time}
+        </div>
+      `;
+      
+      document.body.appendChild(message);
+      
+      // Remove after 5 seconds
+      setTimeout(() => {
+        message.style.animation = 'fadeOut 0.3s ease-out forwards';
+        setTimeout(() => {
+          document.body.removeChild(message);
+        }, 300);
+      }, 5000);
+    }
+    
+    // Show in-app notification
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        max-width: 300px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      let icon = '';
+      let iconColor = '';
+      
+      if (type === 'success') {
+        icon = '<i class="fas fa-check-circle"></i>';
+        iconColor = '#10b981';
+      } else if (type === 'error') {
+        icon = '<i class="fas fa-exclamation-circle"></i>';
+        iconColor = '#ef4444';
+      } else {
+        icon = '<i class="fas fa-info-circle"></i>';
+        iconColor = '#6366f1';
+      }
+      
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center;">
+          <div style="width: 24px; height: 24px; border-radius: 50%; background: ${iconColor}; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+            ${icon}
+          </div>
+          <div>${message}</div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+    
+    // Check for pending notifications on page load
+    function checkNotifications() {
+      const now = new Date();
+      
+      notifications.forEach(notification => {
+        const scheduledFor = new Date(notification.scheduledFor);
+        const timeUntilEvent = scheduledFor - now;
+        
+        if (timeUntilEvent > 0) {
+          // Schedule notification
+          setTimeout(() => {
+            const event = events.find(e => e.id === notification.eventId);
+            if (event) {
+              showNotification(event);
+            }
+            // Remove from notifications array
+            notifications = notifications.filter(n => n.id !== notification.id);
+            saveNotificationsToStorage();
+          }, timeUntilEvent);
+        } else {
+          // Remove expired notifications
+          notifications = notifications.filter(n => n.id !== notification.id);
+          saveNotificationsToStorage();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

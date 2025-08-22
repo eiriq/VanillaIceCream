@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selene Team - Desenvolvedores do VanillaIceOS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* Mesmo estilo do VanillaIceOS para manter consistência */
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #e2e8f0;
+      --gray: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --rgb-red: #ff006e;
+      --rgb-green: #00ff88;
+      --rgb-blue: #00d9ff;
+      --neon-purple: #bf00ff;
+      --neon-blue: #00d4ff;
+      --neon-pink: #ff0080;
+      --neon-yellow: #ffeb3b;
+      --neon-orange: #ff6b35;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -2;
+    }
+    
+    /* RGB particles background */
+    .rgb-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: float 20s infinite linear;
+    }
+    
+    /* Header */
+    .header {
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+      animation: pulse 2s infinite;
+    }
+    
+    .subtitle {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      color: var(--gray);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* Section */
+    .section {
+      margin-bottom: 50px;
+    }
+    
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 30px;
+      text-align: center;
+      color: var(--primary);
+    }
+    
+    /* Developer cards */
+    .developers {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+    
+    .developer-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      max-width: 400px;
+      transition: all 0.3s ease;
+    }
+    
+    .developer-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-color: rgba(99, 102, 241, 0.5);
+    }
+    
+    .developer-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      border: 3px solid var(--primary);
+      overflow: hidden;
+    }
+    
+    .developer-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .developer-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--light);
+    }
+    
+    .developer-age {
+      font-size: 1rem;
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+    
+    .developer-bio {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--light);
+      margin-bottom: 20px;
+    }
+    
+    /* Philosophy section */
+    .philosophy {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 50px;
+    }
+    
+    .philosophy-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--secondary);
+      text-align: center;
+    }
+    
+    .philosophy-content {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--light);
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Project section */
+    .project {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 50px;
+    }
+    
+    .project-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--accent);
+      text-align: center;
+    }
+    
+    .project-content {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--light);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: 30px;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .github-link:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    /* Back button */
+    .back-button {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--light);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 30px;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+      background: rgba(99, 102, 241, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    /* Animations */
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      90% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+      
+      .developers {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      
+      .developer-card {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background elements -->
+  <div class="rgb-particles" id="particles"></div>
+  
+  <!-- Header -->
+  <div class="header">
+    <h1 class="logo">Selene Team</h1>
+    <p class="subtitle">Desenvolvedores do VanillaIceOS</p>
+  </div>
+  
+  <!-- Container -->
+  <div class="container">
+    <!-- Developers Section -->
+    <div class="section">
+      <h2 class="section-title">Conheça os Desenvolvedores</h2>
+      <div class="developers">
+        <div class="developer-card">
+          <div class="developer-avatar">
+            <img src="amanda.png" alt="Amanda">
+          </div>
+          <h3 class="developer-name">Amanda</h3>
+          <p class="developer-age">16 anos</p>
+          <p class="developer-bio">
+            Desenvolvedora apaixonada por Software Livre e tecnologias web. Especialista em interfaces intuitivas e experiências de usuário envolventes. Acredita que a tecnologia deve ser acessível a todos.
+          </p>
+        </div>
+        
+        <div class="developer-card">
+          <div class="developer-avatar">
+            <img src="henrique.png" alt="Henrique">
+          </div>
+          <h3 class="developer-name">Henrique</h3>
+          <p class="developer-age">19 anos</p>
+          <p class="developer-bio">
+            Desenvolvedor focado em sistemas leves e eficientes. Entusiasta de arquiteturas de software e otimização de performance. Busca sempre criar soluções inovadoras e práticas.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Philosophy Section -->
+    <div class="section">
+      <div class="philosophy">
+        <h3 class="philosophy-title">Nossa Filosofia</h3>
+        <div class="philosophy-content">
+          <p>
+            Somos irmãos desenvolvedores independentes que seguem a filosofia do Software Livre (OpenSource). Acreditamos que o conhecimento deve ser compartilhado e que a tecnologia deve ser uma ferramenta de inclusão, não de exclusão.
+          </p>
+          <p>
+            Nosso objetivo é criar sistemas gratuitos e livres que funcionem totalmente nos navegadores, com uma temática gamer e leve o suficiente para qualquer PC ou celular fraco rodar diretamente pelos navegadores favoritos dos usuários!
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Project Section -->
+    <div class="section">
+      <div class="project">
+        <h3 class="project-title">VanillaIceOS</h3>
+        <div class="project-content">
+          <p>
+            O VanillaIceOS é nosso projeto principal: um sistema operacional gamer que roda diretamente no navegador. Desenvolvido com tecnologias web modernas, oferece uma experiência completa de sistema operacional sem necessidade de instalação.
+          </p>
+          <p>
+            O projeto é totalmente open source e está disponível para a comunidade contribuir e melhorar. Acreditamos no poder da colaboração e na força da comunidade para criar tecnologias melhores e mais acessíveis.
+          </p>
+        </div>
+        <div style="text-align: center;">
+          <a href="https://github.com/eiriq/VanillaIceCream" target="_blank" class="github-link">
+            <i class="fab fa-github"></i>
+            Ver no GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Back Button -->
+    <div class="back-button">
+      <a href="desktop.html" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Voltar ao Vanilla!
+      </a>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div class="footer">
+    <p>&copy; 2025 Selene Team - Todos os direitos liberados</p>
+  </div>
+  
+  <script>
+    // Create RGB particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const colors = ['#ff006e', '#00ff88', '#00d9ff', '#bf00ff', '#ff0080'];
+      
+      for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.animationDelay = Math.random() * 20 + 's';
+        particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Initialize particles on page load
+    window.addEventListener('load', function() {
+      createParticles();
+    });
+  </script>
+</body>
+</html>

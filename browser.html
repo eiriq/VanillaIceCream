@@ -1,0 +1,2728 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Microsoft Edge</title>
+  <link rel="icon" href="browser.png" type="image/png"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* Cores do tema claro */
+      --bg-primary: #f3f4f6;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #e5e7eb;
+      --bg-acrylic: rgba(255, 255, 255, 0.7);
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --text-tertiary: #6b7280;
+      --accent: #0078d7;
+      --accent-hover: #0063B1;
+      --border: #d1d5db;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --mica-backdrop: rgba(255, 255, 255, 0.85);
+      --browser-top: #f3f3f3;
+      --browser-tab: #ffffff;
+      --browser-tab-active: #f3f3f3;
+      --browser-address: #f3f3f3;
+      --search-bg: #f3f3f3;
+      --sidebar-bg: #f3f3f3;
+      --sidebar-border: #e5e7eb;
+      --result-item-bg: #ffffff;
+      --result-item-hover: #f9fafb;
+      --settings-bg: #f3f3f3;
+      --settings-sidebar: #ffffff;
+      --settings-border: #e5e7eb;
+    }
+    
+    [data-theme="dark"] {
+      /* Cores do tema escuro */
+      --bg-primary: #202020;
+      --bg-secondary: #2d2d2d;
+      --bg-tertiary: #252525;
+      --bg-acrylic: rgba(32, 32, 32, 0.7);
+      --text-primary: #f3f4f6;
+      --text-secondary: #d1d5db;
+      --text-tertiary: #9ca3af;
+      --accent: #4d94ff;
+      --accent-hover: #3a86ff;
+      --border: #404040;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --mica-backdrop: rgba(32, 32, 32, 0.85);
+      --browser-top: #1a1a1a;
+      --browser-tab: #333333;
+      --browser-tab-active: #222222;
+      --browser-address: #2d2d2d;
+      --search-bg: #1e1e1e;
+      --sidebar-bg: #252525;
+      --sidebar-border: #404040;
+      --result-item-bg: #2d2d2d;
+      --result-item-hover: #404040;
+      --settings-bg: #1e1e1e;
+      --settings-sidebar: #2e2e2e;
+      --settings-border: #3f3f3f;
+    }
+    
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: "Segoe UI Variable", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #7b68ee, #1e90ff);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Main container */
+    .app-container {
+      width: 95%;
+      max-width: 1400px;
+      height: 90vh;
+      max-height: 900px;
+      background: var(--mica-backdrop);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 25px 50px -12px var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    /* Title Bar */
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-acrylic);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+    
+    .title-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .app-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    
+    .app-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .title-bar-controls {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag;
+    }
+    
+    .control-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .control-btn:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .control-btn.close:hover {
+      background: #e81123;
+      color: white;
+    }
+    
+    /* Browser Content */
+    .browser-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Browser Tabs */
+    .browser-tabs {
+      background: var(--browser-top);
+      height: 34px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      user-select: none;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tabs-container {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .tabs-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .browser-tab {
+      background: var(--browser-tab);
+      color: var(--text-primary);
+      border-radius: 4px 4px 0 0;
+      padding: 5px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      min-width: 120px;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.2s ease;
+      animation: fadeInTab 0.3s ease;
+    }
+    
+    @keyframes fadeInTab {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .browser-tab:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .browser-tab.active {
+      background: var(--browser-tab-active);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .browser-tab-icon {
+      width: 16px;
+      height: 16px;
+      fill: var(--text-secondary);
+    }
+    
+    .browser-tab.active .browser-tab-icon {
+      fill: var(--text-primary);
+    }
+    
+    .browser-tab-close {
+      width: 12px;
+      height: 12px;
+      fill: var(--text-tertiary);
+      cursor: pointer;
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+    
+    .browser-tab-close:hover {
+      fill: var(--text-primary);
+    }
+    
+    .new-tab-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 20px;
+      font-weight: 600;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    
+    .new-tab-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    /* Navigation Bar */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      background: var(--browser-top);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .nav-controls {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .nav-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .address-bar-container {
+      position: relative;
+      flex: 1;
+      max-width: 660px;
+      margin: 0 12px;
+    }
+    
+    .address-bar {
+      width: 100%;
+      padding: 6px 44px 6px 36px;
+      border-radius: 24px;
+      border: none;
+      font-size: 14px;
+      background: var(--browser-address);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    
+    .address-bar:focus {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+    
+    .address-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-secondary);
+      pointer-events: none;
+    }
+    
+    .refresh-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .refresh-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    .menu-controls {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .menu-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .menu-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    /* Browser Content Area */
+    .browser-view {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Home Page */
+    .home-page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      padding: 40px 1rem 80px 1rem;
+      background: var(--bg-secondary);
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .ms-icon {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 2px;
+    }
+    
+    .ms-icon > div {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .ms-red {
+      background-color: #f25022;
+    }
+    
+    .ms-green {
+      background-color: #7fba00;
+    }
+    
+    .ms-blue {
+      background-color: #00a4ef;
+    }
+    
+    .ms-yellow {
+      background-color: #ffb900;
+    }
+    
+    .ms-text {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .search-container {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+    }
+    
+    .search-input {
+      width: 100%;
+      height: 44px;
+      border-radius: 22px;
+      border: none;
+      padding: 0 48px 0 48px;
+      font-size: 15px;
+      background: var(--search-bg);
+      color: var(--text-primary);
+      outline: none;
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+    
+    .search-input:focus {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .search-input::placeholder {
+      color: var(--text-tertiary);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: var(--text-tertiary);
+      pointer-events: none;
+    }
+    
+    .search-button {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .quick-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-top: 4px;
+      padding-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .quick-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    
+    .quick-link:hover {
+      transform: translateY(-5px);
+    }
+    
+    .quick-link-icon {
+      background-color: var(--bg-tertiary);
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .quick-link:hover .quick-link-icon {
+      background-color: var(--border);
+    }
+    
+    .quick-link-icon i {
+      font-size: 24px;
+      color: var(--accent);
+    }
+    
+    .quick-link-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 66px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    /* Search Results Page */
+    .search-page {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      background: var(--bg-primary);
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .search-page.active {
+      display: flex;
+    }
+    
+    .search-header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .search-header-input {
+      flex: 1;
+      position: relative;
+    }
+    
+    .search-header-input input {
+      width: 100%;
+      padding: 8px 48px 8px 36px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+    }
+    
+    .search-header-input input:focus {
+      border-color: var(--accent);
+    }
+    
+    .search-header-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-secondary);
+      pointer-events: none;
+    }
+    
+    .search-header-voice {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    
+    .search-header-camera {
+      margin-left: 4px;
+      width: 22px;
+      height: 22px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+    
+    .yandex-logo {
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      background-color: #ff0000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .search-filters {
+      display: flex;
+      gap: 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    
+    .search-filter {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    
+    .search-filter.active {
+      border-bottom: 2px solid var(--accent);
+      color: var(--text-primary);
+    }
+    
+    .search-content {
+      flex: 1;
+      display: flex;
+      padding: 24px;
+      gap: 24px;
+      overflow: auto;
+    }
+    
+    .search-results {
+      flex: 1;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .results-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    
+    .result-item {
+      margin-bottom: 24px;
+      padding: 16px;
+      border-radius: 8px;
+      background: var(--result-item-bg);
+      transition: all 0.2s ease;
+    }
+    
+    .result-item:hover {
+      background: var(--result-item-hover);
+      transform: translateY(-2px);
+    }
+    
+    .result-url {
+      font-size: 12px;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    
+    .result-title {
+      font-size: 18px;
+      margin: 0 0 6px 0;
+    }
+    
+    .result-title a {
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    
+    .result-title a:hover {
+      text-decoration: underline;
+    }
+    
+    .result-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+    
+    /* Settings Page */
+    .settings-page {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      background: var(--settings-bg);
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .settings-page.active {
+      display: flex;
+    }
+    
+    .settings-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .settings-sidebar {
+      background-color: var(--settings-sidebar);
+      min-width: 280px;
+      max-width: 280px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--settings-border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    
+    .settings-sidebar h1 {
+      font-weight: 700;
+      font-size: 1.375rem;
+      margin: 0 0 18px 8px;
+      color: var(--text-primary);
+    }
+    
+    .settings-search {
+      width: 100%;
+      padding: 6px 10px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      outline-offset: 2px;
+      outline-color: var(--accent);
+      outline-style: solid;
+      outline-width: 2px;
+      transition: outline-width 0.15s ease;
+    }
+    
+    .settings-search:focus {
+      outline-width: 3.5px;
+    }
+    
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .settings-nav button,
+    .settings-nav .external-link {
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 8px 14px;
+      border-radius: 5px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      width: 100%;
+    }
+    
+    .settings-nav button:hover,
+    .settings-nav .external-link:hover {
+      background-color: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    
+    .settings-nav button.active {
+      background-color: var(--accent);
+      color: white;
+      font-weight: 600;
+      border-radius: 5px;
+    }
+    
+    .settings-nav button.active svg path {
+      fill: white !important;
+    }
+    
+    .settings-icon {
+      width: 19px;
+      fill: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    
+    button.active .settings-icon{
+      fill: white;
+    }
+    
+    .external-link {
+      justify-content: flex-start;
+      color: var(--text-secondary);
+      font-style: italic;
+      font-size: 0.9rem;
+      gap: 6px;
+    }
+    
+    .external-link svg {
+      width: 14px;
+      fill: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    
+    .external-link:hover {
+      color: var(--accent);
+    }
+    
+    .external-link:hover svg {
+      fill: var(--accent);
+    }
+    
+    .feedback-btn {
+      margin-top: auto;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--bg-primary);
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.25s ease;
+    }
+    
+    .feedback-btn:hover {
+      background-color: var(--accent);
+      color: white;
+    }
+    
+    .settings-content {
+      flex-grow: 1;
+      background-color: var(--bg-primary);
+      padding: 24px 36px;
+      overflow-y: auto;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .settings-content h2 {
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+      color: var(--text-primary);
+    }
+    
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 34px;
+    }
+    
+    .btn-group button {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-weight: 600;
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    
+    .btn-group button svg {
+      width: 18px;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    
+    .btn-group button:hover {
+      background-color: var(--bg-tertiary);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .profile-panel {
+      background-color: var(--bg-secondary);
+      border-radius: 9px;
+      padding: 16px 22px 22px 22px;
+      margin-bottom: 30px;
+      max-width: 760px;
+    }
+    
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    
+    .profile-header h3 {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .add-profile-btn {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      background: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      transition: background-color 0.22s ease;
+      border: 1.5px solid transparent;
+    }
+    
+    .add-profile-btn svg {
+      stroke: var(--text-primary);
+      stroke-width: 2.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+      width: 16px;
+      height: 16px;
+    }
+    
+    .add-profile-btn:hover {
+      background-color: var(--bg-tertiary);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .profile-card {
+      display: flex;
+      background-color: var(--bg-tertiary);
+      border-radius: 10px;
+      padding: 14px 20px;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 760px;
+    }
+    
+    .profile-left {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-grow: 1;
+      min-width: 0;
+    }
+    
+    .profile-photo {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: #888;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    
+    .profile-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 0 0 4px 0;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .profile-email {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .sync-status {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .sync-status svg {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+      width: 14px;
+      height: 14px;
+    }
+    
+    .profile-manage {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      gap: 10px;
+    }
+    
+    .profile-manage svg {
+      width: 17px;
+      height: 17px;
+      stroke: var(--text-secondary);
+      stroke-width: 1.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+    
+    .profile-manage:hover {
+      color: var(--accent);
+    }
+    
+    .profile-manage:hover svg {
+      stroke: var(--accent);
+    }
+    
+    .profile-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    
+    .icon-btn {
+      background: none;
+      border: 1.8px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 9px;
+      cursor: pointer;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.22s ease, color 0.22s ease;
+    }
+    
+    .icon-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+    }
+    
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .logout-btn {
+      background-color: var(--bg-tertiary);
+      border: 1.4px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 6px 18px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.22s ease, color 0.22s ease;
+      white-space: nowrap;
+    }
+    
+    .logout-btn:hover {
+      background-color: var(--bg-tertiary);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .profile-external-link {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      margin-left: 14px;
+      color: var(--text-tertiary);
+    }
+    
+    .profile-external-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      stroke-width: 2.2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+    }
+    
+    .profile-external-link:hover {
+      color: var(--accent);
+    }
+    
+    .profile-external-link:hover svg {
+      stroke: var(--accent);
+    }
+    
+    .profile-configs {
+      max-width: 760px;
+    }
+    
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-top: -6px;
+      margin-bottom: 14px;
+    }
+    
+    .config-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-radius: 9px;
+      background-color: var(--bg-secondary);
+      overflow: hidden;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+    }
+    
+    .config-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      font-size: 1rem;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    
+    .config-list li:last-child {
+      border-bottom: 0;
+    }
+    
+    .config-list li:hover {
+      background-color: var(--bg-tertiary);
+    }
+    
+    .config-list li .icon {
+      flex-shrink: 0;
+      margin-right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      stroke: var(--text-secondary);
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+    }
+    
+    .config-list li:hover .icon {
+      stroke: var(--accent);
+    }
+    
+    .config-list li .text {
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .config-list li .arrow {
+      flex-shrink: 0;
+      stroke: var(--text-secondary);
+      fill: none;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      width: 16px;
+      height: 16px;
+      transition: stroke 0.25s ease;
+    }
+    
+    .config-list li:hover .arrow {
+      stroke: var(--accent);
+    }
+    
+    /* History panel */
+    .history-panel {
+      background-color: var(--bg-secondary);
+      border-radius: 9px;
+      padding: 16px 22px 22px 22px;
+      margin-bottom: 30px;
+      max-width: 760px;
+    }
+    
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    
+    .history-header h3 {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .clear-history-btn {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      background: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      transition: background-color 0.22s ease;
+      border: 1.5px solid transparent;
+    }
+    
+    .clear-history-btn svg {
+      stroke: var(--text-primary);
+      stroke-width: 2.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      fill: none;
+      width: 16px;
+      height: 16px;
+    }
+    
+    .clear-history-btn:hover {
+      background-color: var(--bg-tertiary);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .history-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .history-item-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+      fill: var(--text-secondary);
+    }
+    
+    .history-item-content {
+      flex: 1;
+    }
+    
+    .history-item-title {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .history-item-url {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .history-item-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-left: 10px;
+    }
+    
+    /* About panel */
+    .about-panel {
+      background-color: var(--bg-secondary);
+      border-radius: 9px;
+      padding: 16px 22px 22px 22px;
+      margin-bottom: 30px;
+      max-width: 760px;
+    }
+    
+    .about-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    
+    .about-header h3 {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .about-content {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+    
+    .about-version {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    /* Anonymous mode panel */
+    .anonymous-panel {
+      background-color: var(--bg-secondary);
+      border-radius: 9px;
+      padding: 16px 22px 22px 22px;
+      margin-bottom: 30px;
+      max-width: 760px;
+    }
+    
+    .anonymous-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    
+    .anonymous-header h3 {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .anonymous-toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .anonymous-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .anonymous-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--border);
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .anonymous-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .anonymous-slider {
+      background-color: var(--accent);
+    }
+    
+    input:checked + .anonymous-slider:before {
+      transform: translateX(26px);
+    }
+    
+    .anonymous-description {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-top: 10px;
+    }
+    
+    .anonymous-tabs {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .anonymous-tab {
+      background-color: var(--bg-tertiary);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .anonymous-tab-close {
+      width: 12px;
+      height: 12px;
+      fill: var(--text-tertiary);
+      cursor: pointer;
+    }
+    
+    .anonymous-tab-close:hover {
+      fill: var(--text-primary);
+    }
+    
+    /* Loading spinner */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Theme toggle */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .app-container {
+        width: 100%;
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+      }
+      
+      .search-content {
+        flex-direction: column;
+      }
+      
+      .settings-container {
+        flex-direction: column;
+      }
+      
+      .settings-sidebar {
+        min-width: 100%;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--settings-border);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
+  <div class="app-container">
+    <!-- Title Bar -->
+    <header class="title-bar">
+      <div class="title-bar-left">
+        <div class="app-icon">
+          <i class="fab fa-edge"></i>
+        </div>
+        <div class="app-title">Microsoft Edge</div>
+      </div>
+      <div class="title-bar-controls">
+        <button class="control-btn" aria-label="Minimizar">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button class="control-btn" aria-label="Maximizar">
+          <i class="fas fa-expand"></i>
+        </button>
+        <button class="control-btn close" aria-label="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Browser Content -->
+    <div class="browser-content">
+      <!-- Browser Tabs -->
+      <div class="browser-tabs">
+        <div class="tabs-container" id="tabsContainer">
+          <div class="browser-tab active" data-tab="home">
+            <svg class="browser-tab-icon" viewBox="0 0 24 24">
+              <path d="M6 2C4.895 2 4 2.895 4 4v16c0 1.105.895 2 2 2h12c1.105 0 2-.895 2-2V8l-6-6H6zM16 3.5V9h5.5L16 3.5zM6 4h8v5a1 1 0 0 0 1 1h5v11H6V4z"/>
+            </svg>
+            Nova guia
+            <svg class="browser-tab-close" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="new-tab-btn" id="newTabBtn">+</div>
+      </div>
+      
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <div class="nav-controls">
+          <button class="nav-btn" id="backBtn" disabled>
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button class="nav-btn" id="forwardBtn" disabled>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+          <button class="nav-btn" id="refreshBtn">
+            <i class="fas fa-redo"></i>
+          </button>
+        </div>
+        
+        <div class="address-bar-container">
+          <svg class="address-icon" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" class="address-bar" id="addressBar" placeholder="Pesquisar ou inserir endereço Web">
+          <button class="refresh-btn" id="refreshBtn2">
+            <i class="fas fa-redo"></i>
+          </button>
+        </div>
+        
+        <div class="menu-controls">
+          <button class="menu-btn" id="settingsBtn">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Browser View -->
+      <div class="browser-view">
+        <!-- Home Page -->
+        <div class="home-page" id="homePage">
+          <div class="logo-container">
+            <div class="ms-icon">
+              <div class="ms-red"></div>
+              <div class="ms-green"></div>
+              <div class="ms-blue"></div>
+              <div class="ms-yellow"></div>
+            </div>
+            <span class="ms-text">Microsoft</span>
+          </div>
+          
+          <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Procurar na Web">
+            <svg class="search-icon" viewBox="0 0 24 24">
+              <path fill="none" stroke="currentColor" stroke-width="2" d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35"/>
+            </svg>
+            <button class="search-button" id="searchButton">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path fill="#00A9F4" d="M16 4a12 12 0 1 0 0 24c6.63 0 12-5.37 12-12H16z"/>
+                <path fill="#F25022" d="M16 28a12 12 0 0 0 12-12l-5-6a7 7 0 1 1-7-7v25z"/>
+                <path fill="#7FBA00" d="M16 4v8a4 4 0 0 1 0 8v8a12 12 0 0 0 0-24z"/>
+                <path fill="#FFB902" d="M16 28v-8a4 4 0 0 1 0-8v-8a12 12 0 0 0 0 24z"/>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="quick-links">
+            <div class="quick-link" data-url="https://www.youtube.com">
+              <div class="quick-link-icon">
+                <i class="fab fa-youtube"></i>
+              </div>
+              <div class="quick-link-label">YouTube</div>
+            </div>
+            <div class="quick-link" data-url="https://www.gmail.com">
+              <div class="quick-link-icon">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="quick-link-label">Gmail</div>
+            </div>
+            <div class="quick-link" data-url="https://web.whatsapp.com">
+              <div class="quick-link-icon">
+                <i class="fab fa-whatsapp"></i>
+              </div>
+              <div class="quick-link-label">WhatsApp</div>
+            </div>
+            <div class="quick-link" data-url="https://www.facebook.com">
+              <div class="quick-link-icon">
+                <i class="fab fa-facebook"></i>
+              </div>
+              <div class="quick-link-label">Facebook</div>
+            </div>
+            <div class="quick-link" data-url="https://twitter.com">
+              <div class="quick-link-icon">
+                <i class="fab fa-twitter"></i>
+              </div>
+              <div class="quick-link-label">Twitter</div>
+            </div>
+            <div class="quick-link" data-url="https://www.instagram.com">
+              <div class="quick-link-icon">
+                <i class="fab fa-instagram"></i>
+              </div>
+              <div class="quick-link-label">Instagram</div>
+            </div>
+            <div class="quick-link" id="addQuickLink">
+              <div class="quick-link-icon">
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="quick-link-label">Adicionar</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Search Results Page -->
+        <div class="search-page" id="searchPage">
+          <div class="search-header">
+            <div class="search-header-input">
+              <svg class="search-header-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <input type="search" id="searchHeaderInput" placeholder="Pesquisar na Web">
+              <div class="search-header-voice">
+                <i class="fas fa-microphone"></i>
+              </div>
+            </div>
+            <div class="search-header-camera">
+              <i class="fas fa-camera"></i>
+            </div>
+            <div class="yandex-logo">Я</div>
+            <div class="search-filters">
+              <button class="search-filter active">TUDO</button>
+              <button class="search-filter">IMAGENS</button>
+              <button class="search-filter">VÍDEOS</button>
+              <button class="search-filter">MAPAS</button>
+              <button class="search-filter">NOTÍCIAS</button>
+            </div>
+          </div>
+          
+          <div class="search-content">
+            <div class="search-results" id="searchResults">
+              <div class="loading" id="searchLoading">
+                <div class="spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Settings Page -->
+        <div class="settings-page" id="settingsPage">
+          <div class="settings-container">
+            <aside class="settings-sidebar">
+              <h1>Configurações</h1>
+              <input type="search" class="settings-search" placeholder="Pesquisar configurações">
+              <nav class="settings-nav">
+                <button class="active" id="historySettingsBtn">
+                  <svg class="settings-icon" viewBox="0 0 24 24">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M12 7v5l4 2"></path>
+                  </svg>
+                  Histórico
+                </button>
+                <button id="anonymousSettingsBtn">
+                  <svg class="settings-icon" viewBox="0 0 24 24">
+                    <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM18 21a1 1 0 0 0 1-1v-2a6 6 0 0 0-3-5.2"></path>
+                    <path d="M8 21a1 1 0 0 1-1-1v-2a6 6 0 0 1 3-5.2"></path>
+                  </svg>
+                  Modo anônimo
+                </button>
+                <button id="clearHistorySettingsBtn">
+                  <svg class="settings-icon" viewBox="0 0 24 24">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path>
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  Limpar histórico
+                </button>
+                <button id="aboutSettingsBtn">
+                  <svg class="settings-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                  </svg>
+                  Sobre
+                </button>
+              </nav>
+              <button class="feedback-btn">Enviar comentários</button>
+            </aside>
+            
+            <main class="settings-content">
+              <!-- History Section -->
+              <section id="historySection" class="settings-section">
+                <div class="history-panel">
+                  <div class="history-header">
+                    <h3>Histórico de navegação</h3>
+                    <button class="clear-history-btn" id="clearHistoryBtn">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path>
+                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                      Limpar tudo
+                    </button>
+                  </div>
+                  <div class="history-list" id="historyList">
+                    <div class="history-item">
+                      <svg class="history-item-icon" viewBox="0 0 24 24">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M12 7v5l4 2"></path>
+                      </svg>
+                      <div class="history-item-content">
+                        <div class="history-item-title">Pesquisa sobre tecnologia</div>
+                        <div class="history-item-url">https://yandex.com/search?text=tecnologia</div>
+                      </div>
+                      <div class="history-item-time">Hoje, 10:30</div>
+                    </div>
+                    <div class="history-item">
+                      <svg class="history-item-icon" viewBox="0 0 24 24">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M12 7v5l4 2"></path>
+                      </svg>
+                      <div class="history-item-content">
+                        <div class="history-item-title">YouTube</div>
+                        <div class="history-item-url">https://www.youtube.com</div>
+                      </div>
+                      <div class="history-item-time">Hoje, 09:15</div>
+                    </div>
+                    <div class="history-item">
+                      <svg class="history-item-icon" viewBox="0 0 24 24">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M12 7v5l4 2"></path>
+                      </svg>
+                      <div class="history-item-content">
+                        <div class="history-item-title">Gmail</div>
+                        <div class="history-item-url">https://www.gmail.com</div>
+                      </div>
+                      <div class="history-item-time">Ontem, 18:45</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              
+              <!-- Anonymous Mode Section -->
+              <section id="anonymousSection" class="settings-section" style="display: none;">
+                <div class="anonymous-panel">
+                  <div class="anonymous-header">
+                    <h3>Modo anônimo</h3>
+                    <label class="anonymous-toggle">
+                      <input type="checkbox" id="anonymousModeToggle">
+                      <span class="anonymous-slider"></span>
+                    </label>
+                  </div>
+                  <div class="anonymous-description">
+                    O modo anônimo permite navegar sem salvar seu histórico de navegação, cookies, dados de sites ou informações inseridas em formulários.
+                  </div>
+                  <div class="anonymous-tabs" id="anonymousTabs">
+                    <div class="anonymous-tab">
+                      Nova guia anônima
+                      <svg class="anonymous-tab-close" viewBox="0 0 24 24">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              
+              <!-- Clear History Section -->
+              <section id="clearHistorySection" class="settings-section" style="display: none;">
+                <div class="history-panel">
+                  <div class="history-header">
+                    <h3>Limpar histórico de navegação</h3>
+                  </div>
+                  <div class="about-content">
+                    <p>Selecione o tipo de dados que deseja limpar:</p>
+                    <div style="margin-top: 15px;">
+                      <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" style="margin-right: 10px;" checked>
+                        <span>Histórico de navegação</span>
+                      </label>
+                      <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" style="margin-right: 10px;" checked>
+                        <span>Cookies e outros dados de sites</span>
+                      </label>
+                      <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" style="margin-right: 10px;">
+                        <span>Imagens e outros arquivos em cache</span>
+                      </label>
+                      <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" style="margin-right: 10px;">
+                        <span>Senhas salvas</span>
+                      </label>
+                      <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="checkbox" style="margin-right: 10px;">
+                        <span>Dados de preenchimento automático de formulários</span>
+                      </label>
+                    </div>
+                    <div style="margin-top: 20px;">
+                      <label style="display: block; margin-bottom: 10px;">Intervalo de tempo:</label>
+                      <select style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-secondary); color: var(--text-primary);">
+                        <option value="1">Última hora</option>
+                        <option value="24">Últimas 24 horas</option>
+                        <option value="7" selected>Últimos 7 dias</option>
+                        <option value="30">Últimos 30 dias</option>
+                        <option value="all">Todo o período</option>
+                      </select>
+                    </div>
+                    <button style="margin-top: 20px; padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                      Limpar dados
+                    </button>
+                  </div>
+                </div>
+              </section>
+              
+              <!-- About Section -->
+              <section id="aboutSection" class="settings-section" style="display: none;">
+                <div class="about-panel">
+                  <div class="about-header">
+                    <h3>Sobre o Microsoft Edge</h3>
+                  </div>
+                  <div class="about-content">
+                    <p>Este é um projeto de simulação do navegador Microsoft Edge, desenvolvido para fins educacionais e demonstrativos.</p>
+                    <p style="margin-top: 10px;">O projeto implementa uma interface similar ao navegador real, com funcionalidades básicas como navegação por abas, histórico de navegação, modo anônimo e pesquisa na web através do Yandex.</p>
+                    <p style="margin-top: 10px;">Desenvolvido com HTML, CSS e JavaScript puro, sem dependências externas além do Font Awesome para ícones.</p>
+                    <div class="about-version">
+                      Versão: 1.0.0
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const themeIcon = themeToggle.querySelector('i');
+    
+    // Check for saved theme preference or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+      body.setAttribute('data-theme', 'dark');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      if (body.getAttribute('data-theme') === 'dark') {
+        body.removeAttribute('data-theme');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+    
+    // Browser functionality
+    const tabsContainer = document.getElementById('tabsContainer');
+    const newTabBtn = document.getElementById('newTabBtn');
+    const addressBar = document.getElementById('addressBar');
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const homePage = document.getElementById('homePage');
+    const searchPage = document.getElementById('searchPage');
+    const settingsPage = document.getElementById('settingsPage');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const searchHeaderInput = document.getElementById('searchHeaderInput');
+    const searchResults = document.getElementById('searchResults');
+    const searchLoading = document.getElementById('searchLoading');
+    const backBtn = document.getElementById('backBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const refreshBtn2 = document.getElementById('refreshBtn2');
+    
+    // Settings navigation
+    const historySettingsBtn = document.getElementById('historySettingsBtn');
+    const anonymousSettingsBtn = document.getElementById('anonymousSettingsBtn');
+    const clearHistorySettingsBtn = document.getElementById('clearHistorySettingsBtn');
+    const aboutSettingsBtn = document.getElementById('aboutSettingsBtn');
+    
+    // Settings sections
+    const historySection = document.getElementById('historySection');
+    const anonymousSection = document.getElementById('anonymousSection');
+    const clearHistorySection = document.getElementById('clearHistorySection');
+    const aboutSection = document.getElementById('aboutSection');
+    
+    // History functionality
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const historyList = document.getElementById('historyList');
+    
+    // Anonymous mode functionality
+    const anonymousModeToggle = document.getElementById('anonymousModeToggle');
+    const anonymousTabs = document.getElementById('anonymousTabs');
+    
+    let tabs = [
+      { id: 'home', title: 'Nova guia', url: '', active: true }
+    ];
+    
+    let history = [];
+    let historyIndex = -1;
+    let isAnonymousMode = false;
+    
+    // Initialize browser
+    document.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      loadQuickLinks();
+      loadHistory();
+    });
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // New tab button
+      newTabBtn.addEventListener('click', createNewTab);
+      
+      // Address bar
+      addressBar.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          navigateTo(addressBar.value);
+        }
+      });
+      
+      // Search input
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          performYandexSearch(searchInput.value);
+        }
+      });
+      
+      searchButton.addEventListener('click', () => {
+        performYandexSearch(searchInput.value);
+      });
+      
+      // Settings button
+      settingsBtn.addEventListener('click', showSettingsPage);
+      
+      // Search header input
+      searchHeaderInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          performYandexSearch(searchHeaderInput.value);
+        }
+      });
+      
+      // Navigation buttons
+      backBtn.addEventListener('click', goBack);
+      forwardBtn.addEventListener('click', goForward);
+      refreshBtn.addEventListener('click', refreshPage);
+      refreshBtn2.addEventListener('click', refreshPage);
+      
+      // Quick links
+      document.querySelectorAll('.quick-link[data-url]').forEach(link => {
+        link.addEventListener('click', () => {
+          navigateTo(link.dataset.url);
+        });
+      });
+      
+      // Add quick link
+      document.getElementById('addQuickLink').addEventListener('click', addQuickLink);
+      
+      // Search filters
+      document.querySelectorAll('.search-filter').forEach(filter => {
+        filter.addEventListener('click', () => {
+          document.querySelectorAll('.search-filter').forEach(f => f.classList.remove('active'));
+          filter.classList.add('active');
+          performYandexSearch(searchHeaderInput.value);
+        });
+      });
+      
+      // Window control buttons
+      document.querySelector('.control-btn.close').addEventListener('click', () => {
+        if (confirm('Deseja fechar o Microsoft Edge?')) {
+          window.close();
+        }
+      });
+      
+      document.querySelector('.control-btn:nth-child(2)').addEventListener('click', () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
+      });
+      
+      document.querySelector('.control-btn:nth-child(1)').addEventListener('click', () => {
+        document.body.style.display = 'none';
+        setTimeout(() => {
+          document.body.style.display = 'flex';
+        }, 1000);
+      });
+      
+      // Settings navigation
+      historySettingsBtn.addEventListener('click', () => showSettingsSection('history'));
+      anonymousSettingsBtn.addEventListener('click', () => showSettingsSection('anonymous'));
+      clearHistorySettingsBtn.addEventListener('click', () => showSettingsSection('clearHistory'));
+      aboutSettingsBtn.addEventListener('click', () => showSettingsSection('about'));
+      
+      // Clear history button
+      clearHistoryBtn.addEventListener('click', clearAllHistory);
+      
+      // Anonymous mode toggle
+      anonymousModeToggle.addEventListener('change', toggleAnonymousMode);
+    }
+    
+    // Create new tab
+    function createNewTab() {
+      const tabId = 'tab-' + Date.now();
+      const newTab = {
+        id: tabId,
+        title: 'Nova guia',
+        url: '',
+        active: true,
+        isAnonymous: isAnonymousMode
+      };
+      
+      // Deactivate all tabs
+      tabs.forEach(tab => tab.active = false);
+      
+      // Add new tab
+      tabs.push(newTab);
+      
+      // Render tabs
+      renderTabs();
+      
+      // Show home page
+      showHomePage();
+    }
+    
+    // Render tabs
+    function renderTabs() {
+      tabsContainer.innerHTML = '';
+      
+      tabs.forEach(tab => {
+        const tabElement = document.createElement('div');
+        tabElement.className = 'browser-tab' + (tab.active ? ' active' : '');
+        if (tab.isAnonymous) {
+          tabElement.style.backgroundColor = 'var(--bg-tertiary)';
+        }
+        tabElement.dataset.tab = tab.id;
+        
+        tabElement.innerHTML = `
+          <svg class="browser-tab-icon" viewBox="0 0 24 24">
+            <path d="M6 2C4.895 2 4 2.895 4 4v16c0 1.105.895 2 2 2h12c1.105 0 2-.895 2-2V8l-6-6H6zM16 3.5V9h5.5L16 3.5zM6 4h8v5a1 1 0 0 0 1 1h5v11H6V4z"/>
+          </svg>
+          ${tab.title}
+          <svg class="browser-tab-close" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        `;
+        
+        // Tab click event
+        tabElement.addEventListener('click', (e) => {
+          if (!e.target.classList.contains('browser-tab-close')) {
+            switchToTab(tab.id);
+          }
+        });
+        
+        // Tab close event
+        tabElement.querySelector('.browser-tab-close').addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeTab(tab.id);
+        });
+        
+        tabsContainer.appendChild(tabElement);
+      });
+    }
+    
+    // Switch to tab
+    function switchToTab(tabId) {
+      // Deactivate all tabs
+      tabs.forEach(tab => tab.active = false);
+      
+      // Activate selected tab
+      const tab = tabs.find(t => t.id === tabId);
+      if (tab) {
+        tab.active = true;
+        
+        // Update address bar
+        addressBar.value = tab.url;
+        
+        // Show appropriate page
+        if (tab.url && tab.url !== '') {
+          if (tab.url === 'edge://settings') {
+            showSettingsPage();
+          } else {
+            showSearchPage();
+            searchHeaderInput.value = tab.url;
+          }
+        } else {
+          showHomePage();
+        }
+        
+        // Render tabs
+        renderTabs();
+      }
+    }
+    
+    // Close tab
+    function closeTab(tabId) {
+      // Find tab to close
+      const tabToClose = tabs.find(tab => tab.id === tabId);
+      
+      // Add animation before removing
+      const tabElement = document.querySelector(`.browser-tab[data-tab="${tabId}"]`);
+      if (tabElement) {
+        tabElement.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => {
+          // Remove tab
+          tabs = tabs.filter(tab => tab.id !== tabId);
+          
+          // If no tabs left, create a new one
+          if (tabs.length === 0) {
+            createNewTab();
+            return;
+          }
+          
+          // If closed tab was active, activate another tab
+          if (!tabs.find(tab => tab.active)) {
+            tabs[tabs.length - 1].active = true;
+          }
+          
+          // Render tabs
+          renderTabs();
+          
+          // Switch to active tab
+          const activeTab = tabs.find(tab => tab.active);
+          if (activeTab) {
+            switchToTab(activeTab.id);
+          }
+        }, 300);
+      }
+    }
+    
+    // Navigate to URL
+    function navigateTo(url) {
+      if (!url) return;
+      
+      // Add protocol if missing
+      if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('edge://')) {
+        url = 'https://' + url;
+      }
+      
+      // Update active tab
+      const activeTab = tabs.find(tab => tab.active);
+      if (activeTab) {
+        activeTab.url = url;
+        activeTab.title = url;
+        renderTabs();
+      }
+      
+      // Update address bar
+      addressBar.value = url;
+      
+      // Add to history if not in anonymous mode
+      if (!isAnonymousMode && !activeTab.isAnonymous) {
+        addToHistory(url);
+      }
+      
+      // Show appropriate page
+      if (url === 'edge://settings') {
+        showSettingsPage();
+      } else {
+        showSearchPage();
+        searchHeaderInput.value = url;
+        
+        // Show loading
+        searchResults.innerHTML = `
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        `;
+        
+        // Simulate loading a website
+        setTimeout(() => {
+          searchResults.innerHTML = `
+            <div class="results-count">Carregando página...</div>
+            <div class="result-item">
+              <div class="result-url">${url}</div>
+              <div class="result-title"><a href="${url}" target="_blank">${url}</a></div>
+              <div class="result-description">Esta é uma simulação de navegador. Para acessar sites reais, use um navegador completo.</div>
+            </div>
+          `;
+        }, 1500);
+      }
+    }
+    
+    // Perform search using Yandex
+    function performYandexSearch(query) {
+      if (!query) return;
+      
+      // Create Yandex search URL
+      const yandexUrl = `https://yandex.com/search?text=${encodeURIComponent(query)}&lr=219122&search_source=yacom_desktop_common`;
+      
+      // Update active tab
+      const activeTab = tabs.find(tab => tab.active);
+      if (activeTab) {
+        activeTab.url = yandexUrl;
+        activeTab.title = query;
+        renderTabs();
+      }
+      
+      // Update address bar
+      addressBar.value = yandexUrl;
+      
+      // Add to history if not in anonymous mode
+      if (!isAnonymousMode && !activeTab.isAnonymous) {
+        addToHistory(yandexUrl, query);
+      }
+      
+      // Show search page
+      showSearchPage();
+      searchHeaderInput.value = query;
+      
+      // Show loading
+      searchResults.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      `;
+      
+      // Simulate search results
+      setTimeout(() => {
+        displayYandexSearchResults(query);
+      }, 1500);
+    }
+    
+    // Display Yandex search results
+    function displayYandexSearchResults(query) {
+      searchResults.innerHTML = `
+        <div class="results-count">Cerca de ${Math.floor(Math.random() * 10000000)} resultados</div>
+      `;
+      
+      // Generate some mock results based on the query
+      for (let i = 1; i <= 5; i++) {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        
+        resultItem.innerHTML = `
+          <div class="result-url">https://example${i}.com/${query.replace(/\s+/g, '-')}</div>
+          <div class="result-title"><a href="https://yandex.com/search?text=${encodeURIComponent(query)}&lr=219122&search_source=yacom_desktop_common" target="_blank">${query} - Resultado ${i}</a></div>
+          <div class="result-description">Este é um resultado de pesquisa para "${query}" no Yandex. Contém informações relevantes sobre o termo pesquisado e pode ser útil para encontrar o que você está procurando.</div>
+        `;
+        
+        searchResults.appendChild(resultItem);
+      }
+    }
+    
+    // Show home page
+    function showHomePage() {
+      homePage.style.display = 'flex';
+      searchPage.classList.remove('active');
+      settingsPage.classList.remove('active');
+    }
+    
+    // Show search page
+    function showSearchPage() {
+      homePage.style.display = 'none';
+      settingsPage.classList.remove('active');
+      searchPage.classList.add('active');
+    }
+    
+    // Show settings page
+    function showSettingsPage() {
+      homePage.style.display = 'none';
+      searchPage.classList.remove('active');
+      settingsPage.classList.add('active');
+      
+      // Update active tab if needed
+      const activeTab = tabs.find(tab => tab.active);
+      if (activeTab && activeTab.url !== 'edge://settings') {
+        activeTab.url = 'edge://settings';
+        activeTab.title = 'Configurações';
+        renderTabs();
+        addressBar.value = 'edge://settings';
+      }
+      
+      // Show history section by default
+      showSettingsSection('history');
+    }
+    
+    // Show settings section
+    function showSettingsSection(section) {
+      // Hide all sections
+      historySection.style.display = 'none';
+      anonymousSection.style.display = 'none';
+      clearHistorySection.style.display = 'none';
+      aboutSection.style.display = 'none';
+      
+      // Remove active class from all buttons
+      document.querySelectorAll('.settings-nav button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected section
+      switch(section) {
+        case 'history':
+          historySection.style.display = 'block';
+          historySettingsBtn.classList.add('active');
+          break;
+        case 'anonymous':
+          anonymousSection.style.display = 'block';
+          anonymousSettingsBtn.classList.add('active');
+          break;
+        case 'clearHistory':
+          clearHistorySection.style.display = 'block';
+          clearHistorySettingsBtn.classList.add('active');
+          break;
+        case 'about':
+          aboutSection.style.display = 'block';
+          aboutSettingsBtn.classList.add('active');
+          break;
+      }
+    }
+    
+    // Add to history
+    function addToHistory(url, title) {
+      // Remove forward history if we're not at the end
+      if (historyIndex < history.length - 1) {
+        history = history.slice(0, historyIndex + 1);
+      }
+      
+      // Add new URL to history
+      const now = new Date();
+      const timeString = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+      const dateString = now.toLocaleDateString('pt-BR', { weekday: 'long' });
+      
+      history.push({
+        url,
+        title: title || url,
+        time: timeString,
+        date: dateString === new Date().toLocaleDateString('pt-BR', { weekday: 'long' }) ? 'Hoje' : dateString
+      });
+      
+      historyIndex++;
+      
+      // Update navigation buttons
+      updateNavigationButtons();
+      
+      // Update history display
+      updateHistoryDisplay();
+      
+      // Save history to localStorage
+      saveHistory();
+    }
+    
+    // Update history display
+    function updateHistoryDisplay() {
+      historyList.innerHTML = '';
+      
+      if (history.length === 0) {
+        historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">Nenhum histórico de navegação</div>';
+        return;
+      }
+      
+      // Show last 10 history items
+      const recentHistory = history.slice(-10).reverse();
+      
+      recentHistory.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        
+        historyItem.innerHTML = `
+          <svg class="history-item-icon" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M12 7v5l4 2"></path>
+          </svg>
+          <div class="history-item-content">
+            <div class="history-item-title">${item.title}</div>
+            <div class="history-item-url">${item.url}</div>
+          </div>
+          <div class="history-item-time">${item.date}, ${item.time}</div>
+        `;
+        
+        historyItem.addEventListener('click', () => {
+          navigateTo(item.url);
+        });
+        
+        historyList.appendChild(historyItem);
+      });
+    }
+    
+    // Clear all history
+    function clearAllHistory() {
+      if (confirm('Tem certeza de que deseja limpar todo o histórico de navegação?')) {
+        history = [];
+        historyIndex = -1;
+        updateHistoryDisplay();
+        saveHistory();
+      }
+    }
+    
+    // Save history to localStorage
+    function saveHistory() {
+      localStorage.setItem('edgeHistory', JSON.stringify(history));
+    }
+    
+    // Load history from localStorage
+    function loadHistory() {
+      const savedHistory = localStorage.getItem('edgeHistory');
+      if (savedHistory) {
+        history = JSON.parse(savedHistory);
+        historyIndex = history.length - 1;
+        updateHistoryDisplay();
+        updateNavigationButtons();
+      }
+    }
+    
+    // Toggle anonymous mode
+    function toggleAnonymousMode() {
+      isAnonymousMode = anonymousModeToggle.checked;
+      
+      if (isAnonymousMode) {
+        // Add anonymous tab
+        const tabId = 'tab-' + Date.now();
+        const newTab = {
+          id: tabId,
+          title: 'Nova guia anônima',
+          url: '',
+          active: true,
+          isAnonymous: true
+        };
+        
+        // Deactivate all tabs
+        tabs.forEach(tab => tab.active = false);
+        
+        // Add new tab
+        tabs.push(newTab);
+        
+        // Render tabs
+        renderTabs();
+        
+        // Show home page
+        showHomePage();
+        
+        // Add to anonymous tabs list
+        const anonymousTab = document.createElement('div');
+        anonymousTab.className = 'anonymous-tab';
+        anonymousTab.innerHTML = `
+          Nova guia anônima
+          <svg class="anonymous-tab-close" viewBox="0 0 24 24">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        `;
+        
+        anonymousTab.querySelector('.anonymous-tab-close').addEventListener('click', () => {
+          anonymousTab.remove();
+        });
+        
+        anonymousTabs.appendChild(anonymousTab);
+      } else {
+        // Remove all anonymous tabs
+        tabs = tabs.filter(tab => !tab.isAnonymous);
+        
+        // If no tabs left, create a new one
+        if (tabs.length === 0) {
+          createNewTab();
+        } else {
+          // Activate first tab
+          tabs[0].active = true;
+          switchToTab(tabs[0].id);
+        }
+        
+        // Clear anonymous tabs list
+        anonymousTabs.innerHTML = '';
+      }
+    }
+    
+    // Go back in history
+    function goBack() {
+      if (historyIndex > 0) {
+        historyIndex--;
+        const url = history[historyIndex].url;
+        addressBar.value = url;
+        navigateTo(url);
+      }
+    }
+    
+    // Go forward in history
+    function goForward() {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        const url = history[historyIndex].url;
+        addressBar.value = url;
+        navigateTo(url);
+      }
+    }
+    
+    // Refresh page
+    function refreshPage() {
+      const activeTab = tabs.find(tab => tab.active);
+      if (activeTab && activeTab.url) {
+        navigateTo(activeTab.url);
+      }
+    }
+    
+    // Update navigation buttons
+    function updateNavigationButtons() {
+      backBtn.disabled = historyIndex <= 0;
+      forwardBtn.disabled = historyIndex >= history.length - 1;
+    }
+    
+    // Load quick links from localStorage
+    function loadQuickLinks() {
+      const savedLinks = localStorage.getItem('edgeQuickLinks');
+      if (savedLinks) {
+        const links = JSON.parse(savedLinks);
+        // Add the saved links to the quick links container
+        const quickLinksContainer = document.querySelector('.quick-links');
+        const addLinkButton = document.getElementById('addQuickLink');
+        
+        // Remove existing links except the add button
+        while (quickLinksContainer.firstChild && quickLinksContainer.firstChild !== addLinkButton) {
+          quickLinksContainer.removeChild(quickLinksContainer.firstChild);
+        }
+        
+        // Add saved links
+        links.forEach(link => {
+          const linkElement = createQuickLinkElement(link);
+          quickLinksContainer.insertBefore(linkElement, addLinkButton);
+        });
+      }
+    }
+    
+    // Create quick link element
+    function createQuickLinkElement(link) {
+      const linkElement = document.createElement('div');
+      linkElement.className = 'quick-link';
+      linkElement.dataset.url = link.url;
+      
+      linkElement.innerHTML = `
+        <div class="quick-link-icon">
+          <i class="${link.icon}"></i>
+        </div>
+        <div class="quick-link-label">${link.title}</div>
+      `;
+      
+      linkElement.addEventListener('click', () => {
+        navigateTo(link.url);
+      });
+      
+      return linkElement;
+    }
+    
+    // Add quick link
+    function addQuickLink() {
+      const title = prompt('Nome do atalho:');
+      if (!title) return;
+      
+      const url = prompt('URL do atalho:');
+      if (!url) return;
+      
+      const icon = prompt('Ícone (classe Font Awesome):', 'fas fa-globe');
+      if (!icon) return;
+      
+      const link = { title, url, icon };
+      
+      // Get existing links
+      let links = [];
+      const savedLinks = localStorage.getItem('edgeQuickLinks');
+      if (savedLinks) {
+        links = JSON.parse(savedLinks);
+      }
+      
+      // Add new link
+      links.push(link);
+      
+      // Save to localStorage
+      localStorage.setItem('edgeQuickLinks', JSON.stringify(links));
+      
+      // Reload quick links
+      loadQuickLinks();
+    }
+    
+    // Add fade out animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

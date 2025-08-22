@@ -1,0 +1,2516 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus Gallery Red - Sua Coleção Visual</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Nova paleta de cores vermelha */
+      --primary: #e63946;
+      --primary-dark: #c9184a;
+      --secondary: #8b0000;
+      --accent: #ff4d6d;
+      --tertiary: #ff8fa3;
+      --dark: #0a0a0a;
+      --darker: #000000;
+      --light: #f8f9fa;
+      --gray: #adb5bd;
+      --metallic: #c0c0c0;
+      --gold: #ffd700;
+      --orange: #ff6b35;
+      --warning: #ff9e00;
+      --danger: #e63946;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Exo', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a, #4a0e0e, #2d0707);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Animated background */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(230, 57, 70, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 77, 109, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 107, 53, 0.15) 0%, transparent 50%);
+      animation: bgPulse 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes bgPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Glass morphism effect */
+    .glass {
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(230, 57, 70, 0.4);
+    }
+    
+    .glass-light {
+      background: rgba(30, 10, 10, 0.6);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(230, 57, 70, 0.3);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 10, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes redPulse {
+      0% { filter: hue-rotate(0deg) brightness(1); }
+      50% { filter: hue-rotate(10deg) brightness(1.2); }
+      100% { filter: hue-rotate(0deg) brightness(1); }
+    }
+    
+    @keyframes glow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+      50% { box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary); }
+    }
+    
+    @keyframes redGlow {
+      0% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary), inset 0 0 10px rgba(230, 57, 70, 0.2); }
+      50% { box-shadow: 0 0 15px var(--primary), 0 0 25px var(--primary), 0 0 35px var(--primary), inset 0 0 15px rgba(230, 57, 70, 0.4); }
+      100% { box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 15px var(--primary), inset 0 0 10px rgba(230, 57, 70, 0.2); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes energyPulse {
+      0% { filter: brightness(1) drop-shadow(0 0 5px rgba(230, 57, 70, 0.7)); }
+      50% { filter: brightness(1.2) drop-shadow(0 0 15px rgba(230, 57, 70, 0.9)); }
+      100% { filter: brightness(1) drop-shadow(0 0 5px rgba(230, 57, 70, 0.7)); }
+    }
+    
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .animate-fade-in {
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .animate-red {
+      animation: redPulse 3s linear infinite;
+    }
+    
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .animate-red-glow {
+      animation: redGlow 2s ease-in-out infinite;
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .animate-zoom-in {
+      animation: zoomIn 0.3s ease-out;
+    }
+    
+    .animate-energy {
+      animation: energyPulse 2s ease-in-out infinite;
+    }
+    
+    .animate-rotate {
+      animation: rotate 20s linear infinite;
+    }
+    
+    /* Main container */
+    .app-container {
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: none;
+      border-radius: 0;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(230, 57, 70, 0.4);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 20px rgba(230, 57, 70, 0.7);
+      animation: redGlow 2s ease-in-out infinite;
+    }
+    
+    .app-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(230, 57, 70, 0.7);
+    }
+    
+    .system-stats {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(230, 57, 70, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(230, 57, 70, 0.3);
+    }
+    
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    /* App Content */
+    .app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background: rgba(10, 10, 10, 0.6);
+      border-right: 1px solid rgba(230, 57, 70, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      gap: 20px;
+      overflow-y: auto;
+    }
+    
+    .sidebar-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 22px;
+      position: relative;
+    }
+    
+    .sidebar-btn:hover {
+      background: rgba(230, 57, 70, 0.2);
+      transform: translateY(-3px);
+    }
+    
+    .sidebar-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 0 20px rgba(230, 57, 70, 0.7);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(230, 57, 70, 0.8);
+    }
+    
+    /* Gallery Container */
+    .gallery-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Gallery Header */
+    .gallery-header {
+      padding: 20px;
+      background: rgba(10, 10, 10, 0.6);
+      border-bottom: 1px solid rgba(230, 57, 70, 0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      z-index: 10;
+    }
+    
+    .gallery-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .gallery-title i {
+      color: var(--primary);
+      font-size: 24px;
+    }
+    
+    .gallery-search {
+      flex: 1;
+      max-width: 500px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      background: rgba(10, 10, 10, 0.8);
+      color: var(--light);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .gallery-search:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(230, 57, 70, 0.3);
+    }
+    
+    .gallery-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      background: rgba(230, 57, 70, 0.2);
+      color: var(--light);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    
+    .action-btn:hover {
+      background: rgba(230, 57, 70, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(230, 57, 70, 0.3);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      box-shadow: 0 10px 25px rgba(230, 57, 70, 0.5);
+    }
+    
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      background: rgba(230, 57, 70, 0.1);
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 18px;
+    }
+    
+    .icon-btn:hover {
+      background: rgba(230, 57, 70, 0.2);
+      transform: translateY(-3px);
+    }
+    
+    .icon-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 0 20px rgba(230, 57, 70, 0.7);
+    }
+    
+    /* Batch Actions Bar */
+    .batch-actions {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 16px 24px;
+      display: none;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid rgba(230, 57, 70, 0.4);
+      animation: slideDown 0.3s ease;
+    }
+    
+    .batch-actions.active {
+      display: flex;
+    }
+    
+    .batch-info {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .batch-actions-buttons {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+    
+    .batch-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .batch-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .batch-btn.danger {
+      background: rgba(201, 24, 74, 0.8);
+      border-color: rgba(201, 24, 74, 0.5);
+    }
+    
+    .batch-btn.danger:hover {
+      background: rgba(201, 24, 74, 1);
+    }
+    
+    /* Gallery Content */
+    .gallery-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+    }
+    
+    .gallery-section {
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    
+    .gallery-section.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .gallery-info {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .gallery-count {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    .gallery-controls {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .control-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--light);
+      cursor: pointer;
+    }
+    
+    .control-checkbox input {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+    
+    /* Gallery Date Section */
+    .date-section {
+      margin-bottom: 32px;
+    }
+    
+    .date-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .date-separator {
+      flex: 1;
+      height: 1px;
+      background: rgba(230, 57, 70, 0.4);
+      margin-left: 16px;
+    }
+    
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    
+    /* Gallery List */
+    .gallery-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .gallery-list-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .gallery-list-item:hover {
+      background: rgba(230, 57, 70, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(230, 57, 70, 0.2);
+    }
+    
+    .gallery-list-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .gallery-list-item-info {
+      flex: 1;
+    }
+    
+    .gallery-list-item-name {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+    
+    .gallery-list-item-date {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .gallery-item {
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      aspect-ratio: 4/3;
+      position: relative;
+    }
+    
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(230, 57, 70, 0.3);
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    
+    .gallery-item-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(230, 57, 70, 0.1);
+      color: var(--gray);
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .gallery-item-selected {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      box-shadow: 0 0 15px rgba(230, 57, 70, 0.8);
+    }
+    
+    .gallery-item.selected .gallery-item-selected {
+      opacity: 1;
+    }
+    
+    .gallery-list-item.selected {
+      background: rgba(230, 57, 70, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 0 30px rgba(230, 57, 70, 0.4);
+    }
+    
+    /* Gallery Item Info */
+    .gallery-item-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      color: white;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-item-info {
+      opacity: 1;
+    }
+    
+    /* Gaming badges */
+    .gaming-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      box-shadow: 0 0 10px rgba(230, 57, 70, 0.8);
+    }
+    
+    .favorite-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 77, 109, 0.8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(255, 77, 109, 0.8);
+    }
+    
+    /* Context Menu */
+    .context-menu {
+      position: absolute;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(230, 57, 70, 0.4);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      min-width: 200px;
+      display: none;
+      overflow: hidden;
+    }
+    
+    .context-menu-item {
+      padding: 14px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--light);
+      transition: background 0.2s ease;
+    }
+    
+    .context-menu-item:hover {
+      background: rgba(230, 57, 70, 0.2);
+    }
+    
+    .context-menu-item.danger {
+      color: var(--danger);
+    }
+    
+    .context-menu-separator {
+      height: 1px;
+      background: rgba(230, 57, 70, 0.4);
+      margin: 6px 0;
+    }
+    
+    /* Fullscreen Viewer */
+    .fullscreen-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .fullscreen-viewer.active {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .viewer-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    
+    .fullscreen-viewer.active .viewer-content {
+      transform: scale(1);
+    }
+    
+    .viewer-image {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 0 50px rgba(230, 57, 70, 0.5);
+    }
+    
+    .viewer-controls {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 16px 24px;
+      border-radius: 30px;
+      border: 1px solid rgba(230, 57, 70, 0.4);
+    }
+    
+    .viewer-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(230, 57, 70, 0.2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 18px;
+    }
+    
+    .viewer-btn:hover {
+      background: rgba(230, 57, 70, 0.4);
+      transform: scale(1.1);
+    }
+    
+    .viewer-close {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(230, 57, 70, 0.8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 18px;
+    }
+    
+    .viewer-close:hover {
+      background: rgba(230, 57, 70, 1);
+      transform: scale(1.1);
+    }
+    
+    .viewer-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(230, 57, 70, 0.6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 24px;
+    }
+    
+    .viewer-nav:hover {
+      background: rgba(230, 57, 70, 0.8);
+      transform: translateY(-50%) scale(1.1);
+    }
+    
+    .viewer-prev {
+      left: 30px;
+    }
+    
+    .viewer-next {
+      right: 30px;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 60px;
+      text-align: center;
+      color: var(--gray);
+    }
+    
+    .empty-state-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      opacity: 0.5;
+      color: var(--primary);
+    }
+    
+    .empty-state-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--light);
+    }
+    
+    .empty-state-description {
+      margin-bottom: 32px;
+      max-width: 500px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    /* Performance indicators */
+    .perf-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .perf-low { background: var(--warning); }
+    .perf-medium { background: var(--orange); }
+    .perf-high { background: var(--danger); }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Filter Tags */
+    .filter-tags {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-tag {
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(230, 57, 70, 0.2);
+      color: var(--light);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(230, 57, 70, 0.3);
+    }
+    
+    .filter-tag:hover {
+      background: rgba(230, 57, 70, 0.3);
+    }
+    
+    .filter-tag.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+      }
+      
+      .sidebar-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      
+      .gallery-search {
+        max-width: 200px;
+      }
+      
+      .action-btn span {
+        display: none;
+      }
+      
+      .batch-actions {
+        padding: 12px 16px;
+      }
+      
+      .batch-btn span {
+        display: none;
+      }
+      
+      .system-stats {
+        display: none;
+      }
+      
+      .app-title {
+        font-size: 18px;
+      }
+      
+      .viewer-controls {
+        padding: 12px 16px;
+        gap: 10px;
+      }
+      
+      .viewer-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+      
+      .viewer-nav {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon animate-red-glow">
+          <i class="fas fa-images"></i>
+        </div>
+        <div class="app-title">NEXUS GALLERY RED</div>
+      </div>
+      
+      <div class="system-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="headerCpu">1%</div>
+          <div class="stat-label">CPU</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerMem">44%</div>
+          <div class="stat-label">RAM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerGpu">0%</div>
+          <div class="stat-label">GPU</div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- Batch Actions Bar -->
+    <div class="batch-actions" id="batchActions">
+      <div class="batch-info" id="batchInfo">0 itens selecionados</div>
+      <div class="batch-actions-buttons">
+        <button class="batch-btn" id="batchFavorite">
+          <i class="fas fa-heart"></i>
+          <span>Favoritar</span>
+        </button>
+        <button class="batch-btn" id="batchEdit">
+          <i class="fas fa-edit"></i>
+          <span>Editar</span>
+        </button>
+        <button class="batch-btn danger" id="batchDelete">
+          <i class="fas fa-trash"></i>
+          <span>Excluir</span>
+        </button>
+        <button class="batch-btn" id="batchRestore" style="display: none;">
+          <i class="fas fa-undo"></i>
+          <span>Restaurar</span>
+        </button>
+        <button class="batch-btn danger" id="batchPermanentDelete" style="display: none;">
+          <i class="fas fa-trash-alt"></i>
+          <span>Excluir Permanentemente</span>
+        </button>
+        <button class="batch-btn" id="batchCancel">
+          <i class="fas fa-times"></i>
+          <span>Cancelar</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- App Content -->
+    <div class="app-content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="sidebar-btn active" title="Galeria" data-section="gallery">
+          <i class="fas fa-images"></i>
+        </button>
+        <button class="sidebar-btn" title="Favoritos" data-section="favorites">
+          <i class="fas fa-heart"></i>
+        </button>
+        <button class="sidebar-btn" title="Capturas de Tela" data-section="screenshots">
+          <i class="fas fa-camera"></i>
+        </button>
+        <button class="sidebar-btn" title="Lixeira" data-section="trash">
+          <i class="fas fa-trash"></i>
+        </button>
+        
+        <div class="sidebar-btn" title="Modo Gamer" style="margin-top: auto; background: linear-gradient(135deg, var(--danger), var(--orange));">
+          <i class="fas fa-gamepad"></i>
+        </div>
+      </div>
+      
+      <!-- Gallery Container -->
+      <div class="gallery-container">
+        <!-- Gallery Header -->
+        <div class="gallery-header">
+          <div class="gallery-title">
+            <i class="fas fa-images"></i>
+            <span id="sectionTitle">Galeria</span>
+          </div>
+          <input type="text" class="gallery-search" id="searchInput" placeholder="Pesquisar mídias...">
+          <div class="gallery-actions">
+            <button class="action-btn primary" id="importBtn">
+              <i class="fas fa-plus"></i>
+              <span>Importar</span>
+            </button>
+            <button class="icon-btn" id="viewListBtn" title="Exibir como lista">
+              <i class="fas fa-list"></i>
+            </button>
+            <button class="icon-btn active" id="viewGridBtn" title="Exibir como grade">
+              <i class="fas fa-th"></i>
+            </button>
+            <button class="icon-btn" id="slideshowBtn" title="Apresentação">
+              <i class="fas fa-play"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Gallery Content -->
+        <div class="gallery-content" id="galleryContent">
+          <!-- Gallery Section -->
+          <div class="gallery-section active" id="gallerySection">
+            <div class="gallery-info">
+              <div class="gallery-count" id="galleryCount">0 mídias</div>
+              <div class="gallery-controls">
+                <label class="control-checkbox">
+                  <input type="checkbox" id="selectAll">
+                  <span>Selecionar tudo</span>
+                </label>
+              </div>
+            </div>
+            <div id="galleryPhotos"></div>
+          </div>
+          
+          <!-- Favorites Section -->
+          <div class="gallery-section" id="favoritesSection">
+            <div class="gallery-info">
+              <div class="gallery-count" id="favoritesCount">0 mídias favoritas</div>
+            </div>
+            <div id="favoritesPhotos"></div>
+          </div>
+          
+          <!-- Screenshots Section -->
+          <div class="gallery-section" id="screenshotsSection">
+            <div class="gallery-info">
+              <div class="gallery-count" id="screenshotsCount">0 capturas de tela</div>
+            </div>
+            <div id="screenshotsPhotos"></div>
+          </div>
+          
+          <!-- Trash Section -->
+          <div class="gallery-section" id="trashSection">
+            <div class="gallery-info">
+              <div class="gallery-count" id="trashCount">0 mídias na lixeira</div>
+              <div class="gallery-controls">
+                <button class="action-btn" id="emptyTrashBtn">
+                  <i class="fas fa-trash-alt"></i>
+                  <span>Esvaziar lixeira</span>
+                </button>
+              </div>
+            </div>
+            <div id="trashPhotos"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Context Menu -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" id="favoriteItem">
+      <i class="fas fa-heart"></i>
+      <span>Favoritar</span>
+    </div>
+    <div class="context-menu-item" id="editItem">
+      <i class="fas fa-edit"></i>
+      <span>Editar</span>
+    </div>
+    <div class="context-menu-item" id="shareItem">
+      <i class="fas fa-share-alt"></i>
+      <span>Compartilhar</span>
+    </div>
+    <div class="context-menu-item" id="setWallpaperItem">
+      <i class="fas fa-desktop"></i>
+      <span>Definir como papel de parede</span>
+    </div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" id="deleteItem">
+      <i class="fas fa-trash"></i>
+      <span>Excluir</span>
+    </div>
+    <div class="context-menu-item danger" id="permanentDeleteItem" style="display: none;">
+      <i class="fas fa-trash-alt"></i>
+      <span>Excluir permanentemente</span>
+    </div>
+    <div class="context-menu-item" id="restoreItem" style="display: none;">
+      <i class="fas fa-undo"></i>
+      <span>Restaurar</span>
+    </div>
+  </div>
+  
+  <!-- Fullscreen Viewer -->
+  <div class="fullscreen-viewer" id="fullscreenViewer">
+    <div class="viewer-content">
+      <img src="" alt="" class="viewer-image" id="viewerImage">
+      <button class="viewer-close" id="viewerClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <button class="viewer-nav viewer-prev" id="viewerPrev">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="viewer-nav viewer-next" id="viewerNext">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="viewer-controls">
+        <button class="viewer-btn" id="viewerFavorite">
+          <i class="far fa-heart"></i>
+        </button>
+        <button class="viewer-btn" id="viewerEdit">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="viewer-btn" id="viewerZoomIn">
+          <i class="fas fa-search-plus"></i>
+        </button>
+        <button class="viewer-btn" id="viewerZoomOut">
+          <i class="fas fa-search-minus"></i>
+        </button>
+        <button class="viewer-btn" id="viewerRotate">
+          <i class="fas fa-redo"></i>
+        </button>
+        <button class="viewer-btn" id="viewerFilter">
+          <i class="fas fa-sliders-h"></i>
+        </button>
+        <button class="viewer-btn" id="viewerShare">
+          <i class="fas fa-share-alt"></i>
+        </button>
+        <button class="viewer-btn" id="viewerDownload">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="viewer-btn" id="viewerDelete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Media data structure
+    let media = {
+      gallery: [],
+      favorites: [],
+      screenshots: [],
+      trash: []
+    };
+    
+    let currentSection = 'gallery';
+    let currentView = 'grid';
+    let selectedMedia = new Set();
+    let viewerIndex = 0;
+    let viewerMediaArray = [];
+    
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMediaFromStorage();
+      renderMedia();
+      setupEventListeners();
+      
+      // Add some sample media if empty
+      if (media.gallery.length === 0) {
+        addSampleMedia();
+      }
+    });
+    
+    // Load media from localStorage
+    function loadMediaFromStorage() {
+      const savedMedia = localStorage.getItem('nexusGalleryMedia');
+      if (savedMedia) {
+        media = JSON.parse(savedMedia);
+      }
+    }
+    
+    // Save media to localStorage
+    function saveMediaToStorage() {
+      localStorage.setItem('nexusGalleryMedia', JSON.stringify(media));
+    }
+    
+    // Add sample media for demonstration
+    function addSampleMedia() {
+      const sampleMedia = [
+        {
+          id: Date.now() + Math.random(),
+          name: 'Gamer Setup.jpg',
+          src: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+          size: 2457600,
+          favorite: true,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 1,
+          name: 'Battle Station.png',
+          src: 'https://images.unsplash.com/photo-1593640408182-31c70c819896?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+          size: 3891200,
+          favorite: false,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 2,
+          name: 'RGB Lighting.jpg',
+          src: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+          size: 3145728,
+          favorite: true,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 3,
+          name: 'Gaming Headset.png',
+          src: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+          size: 2785280,
+          favorite: false,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 4,
+          name: 'Mechanical Keyboard.jpg',
+          src: 'https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
+          size: 2097152,
+          favorite: false,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 5,
+          name: 'Game Collection.jpg',
+          src: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 518400000).toISOString(), // 6 days ago
+          size: 4194304,
+          favorite: true,
+          type: 'image'
+        }
+      ];
+      
+      // Add to gallery
+      media.gallery = [...sampleMedia];
+      
+      // Add favorites
+      media.favorites = sampleMedia.filter(item => item.favorite);
+      
+      // Add some screenshots
+      const screenshots = [
+        {
+          id: Date.now() + Math.random() + 10,
+          name: 'Victory Screen.png',
+          src: 'https://images.unsplash.com/photo-1550745165-9bc0b2527263?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 360000).toISOString(), // 6 hours ago
+          size: 1572864,
+          favorite: false,
+          type: 'screenshot'
+        },
+        {
+          id: Date.now() + Math.random() + 11,
+          name: 'High Score.png',
+          src: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 720000).toISOString(), // 12 hours ago
+          size: 1048576,
+          favorite: true,
+          type: 'screenshot'
+        }
+      ];
+      
+      media.screenshots = [...screenshots];
+      
+      saveMediaToStorage();
+      renderMedia();
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Sidebar navigation
+      const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+      sidebarBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const section = this.getAttribute('data-section');
+          if (section) {
+            switchSection(section);
+          }
+        });
+      });
+      
+      // View toggle
+      document.getElementById('viewGridBtn').addEventListener('click', () => {
+        currentView = 'grid';
+        document.getElementById('viewGridBtn').classList.add('active');
+        document.getElementById('viewListBtn').classList.remove('active');
+        renderMedia();
+      });
+      
+      document.getElementById('viewListBtn').addEventListener('click', () => {
+        currentView = 'list';
+        document.getElementById('viewListBtn').classList.add('active');
+        document.getElementById('viewGridBtn').classList.remove('active');
+        renderMedia();
+      });
+      
+      // Import media
+      document.getElementById('importBtn').addEventListener('click', importMedia);
+      
+      // Slideshow
+      document.getElementById('slideshowBtn').addEventListener('click', startSlideshow);
+      
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        renderMedia(searchTerm);
+      });
+      
+      // Select all checkbox
+      document.getElementById('selectAll').addEventListener('change', function() {
+        const isSelected = this.checked;
+        selectedMedia.clear();
+        
+        if (isSelected) {
+          media[currentSection].forEach(item => {
+            selectedMedia.add(item.id);
+          });
+        }
+        
+        updateMediaSelection();
+        updateSelectAllCheckbox();
+        updateBatchActions();
+      });
+      
+      // Batch actions
+      setupBatchActionListeners();
+      
+      // Context menu
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.gallery-item') || e.target.closest('.gallery-list-item')) {
+          e.preventDefault();
+          showContextMenu(e);
+        } else {
+          hideContextMenu();
+        }
+      });
+      
+      document.addEventListener('click', () => {
+        hideContextMenu();
+      });
+      
+      // Context menu actions
+      document.getElementById('favoriteItem').addEventListener('click', toggleFavorite);
+      document.getElementById('editItem').addEventListener('click', editMedia);
+      document.getElementById('shareItem').addEventListener('click', shareMedia);
+      document.getElementById('setWallpaperItem').addEventListener('click', setWallpaper);
+      document.getElementById('deleteItem').addEventListener('click', deleteMedia);
+      document.getElementById('permanentDeleteItem').addEventListener('click', permanentDeleteMedia);
+      document.getElementById('restoreItem').addEventListener('click', restoreMedia);
+      
+      // Empty trash
+      document.getElementById('emptyTrashBtn').addEventListener('click', emptyTrash);
+      
+      // Fullscreen viewer
+      document.getElementById('viewerClose').addEventListener('click', closeViewer);
+      document.getElementById('viewerPrev').addEventListener('click', previousMedia);
+      document.getElementById('viewerNext').addEventListener('click', nextMedia);
+      document.getElementById('viewerFavorite').addEventListener('click', toggleFavoriteInViewer);
+      document.getElementById('viewerEdit').addEventListener('click', editMediaInViewer);
+      document.getElementById('viewerZoomIn').addEventListener('click', zoomIn);
+      document.getElementById('viewerZoomOut').addEventListener('click', zoomOut);
+      document.getElementById('viewerRotate').addEventListener('click', rotateMedia);
+      document.getElementById('viewerFilter').addEventListener('click', openFilters);
+      document.getElementById('viewerShare').addEventListener('click', shareMediaInViewer);
+      document.getElementById('viewerDownload').addEventListener('click', downloadMedia);
+      document.getElementById('viewerDelete').addEventListener('click', deleteMediaInViewer);
+      
+      // Keyboard navigation in viewer
+      document.addEventListener('keydown', (e) => {
+        if (!document.getElementById('fullscreenViewer').classList.contains('active')) return;
+        
+        if (e.key === 'Escape') {
+          closeViewer();
+        } else if (e.key === 'ArrowLeft') {
+          previousMedia();
+        } else if (e.key === 'ArrowRight') {
+          nextMedia();
+        }
+      });
+    }
+    
+    // Setup batch action listeners
+    function setupBatchActionListeners() {
+      document.getElementById('batchFavorite').addEventListener('click', batchToggleFavorite);
+      document.getElementById('batchEdit').addEventListener('click', batchEditMedia);
+      document.getElementById('batchDelete').addEventListener('click', batchDeleteMedia);
+      document.getElementById('batchRestore').addEventListener('click', batchRestoreMedia);
+      document.getElementById('batchPermanentDelete').addEventListener('click', batchPermanentDeleteMedia);
+      document.getElementById('batchCancel').addEventListener('click', cancelBatchSelection);
+    }
+    
+    // Update batch actions bar
+    function updateBatchActions() {
+      const batchActions = document.getElementById('batchActions');
+      const batchInfo = document.getElementById('batchInfo');
+      const batchFavorite = document.getElementById('batchFavorite');
+      const batchEdit = document.getElementById('batchEdit');
+      const batchDelete = document.getElementById('batchDelete');
+      const batchRestore = document.getElementById('batchRestore');
+      const batchPermanentDelete = document.getElementById('batchPermanentDelete');
+      
+      const selectedCount = selectedMedia.size;
+      const selectedInCurrentSection = Array.from(selectedMedia).filter(id => 
+        media[currentSection].some(item => item.id === id)
+      ).length;
+      
+      if (selectedCount === 0) {
+        batchActions.classList.remove('active');
+        return;
+      }
+      
+      batchActions.classList.add('active');
+      batchInfo.textContent = `${selectedCount} ${selectedCount === 1 ? 'item selecionado' : 'itens selecionados'}`;
+      
+      // Update buttons based on current section
+      if (currentSection === 'trash') {
+        batchFavorite.style.display = 'none';
+        batchEdit.style.display = 'none';
+        batchDelete.style.display = 'none';
+        batchRestore.style.display = 'flex';
+        batchPermanentDelete.style.display = 'flex';
+      } else {
+        batchFavorite.style.display = 'flex';
+        batchEdit.style.display = 'flex';
+        batchDelete.style.display = 'flex';
+        batchRestore.style.display = 'none';
+        batchPermanentDelete.style.display = 'none';
+        
+        // Update favorite button text based on selection
+        const selectedMediaData = Array.from(selectedMedia).map(id => 
+          [...media.gallery, ...media.favorites, ...media.screenshots, ...media.trash].find(p => p.id === id)
+        ).filter(Boolean);
+        
+        const allFavorited = selectedMediaData.every(item => item.favorite);
+        const someFavorited = selectedMediaData.some(item => item.favorite);
+        
+        if (allFavorited) {
+          batchFavorite.innerHTML = '<i class="fas fa-heart"></i><span>Remover dos Favoritos</span>';
+        } else {
+          batchFavorite.innerHTML = '<i class="far fa-heart"></i><span>Favoritar</span>';
+        }
+      }
+    }
+    
+    // Batch toggle favorite
+    function batchToggleFavorite() {
+      const selectedMediaData = Array.from(selectedMedia).map(id => 
+        media.gallery.find(p => p.id === id) || media.screenshots.find(p => p.id === id)
+      ).filter(Boolean);
+      
+      const allFavorited = selectedMediaData.every(item => item.favorite);
+      
+      selectedMediaData.forEach(item => {
+        item.favorite = !allFavorited;
+        
+        // Update favorites array
+        if (item.favorite && !media.favorites.some(p => p.id === item.id)) {
+          media.favorites.push({...item});
+        } else if (!item.favorite) {
+          media.favorites = media.favorites.filter(p => p.id !== item.id);
+        }
+      });
+      
+      saveMediaToStorage();
+      renderMedia();
+      cancelBatchSelection();
+    }
+    
+    // Batch edit media
+    function batchEditMedia() {
+      alert('Função de edição em lote em desenvolvimento');
+      cancelBatchSelection();
+    }
+    
+    // Batch delete media
+    function batchDeleteMedia() {
+      const confirmMessage = selectedMedia.size === 1 
+        ? 'Deseja excluir esta mídia?' 
+        : `Deseja excluir ${selectedMedia.size} mídias?`;
+        
+      if (confirm(confirmMessage)) {
+        Array.from(selectedMedia).forEach(mediaId => {
+          const mediaIndex = media[currentSection].findIndex(p => p.id === mediaId);
+          if (mediaIndex !== -1) {
+            const item = media[currentSection].splice(mediaIndex, 1)[0];
+            media.trash.push(item);
+            
+            // Remove from favorites if it was there
+            media.favorites = media.favorites.filter(p => p.id !== mediaId);
+          }
+        });
+        
+        saveMediaToStorage();
+        renderMedia();
+        cancelBatchSelection();
+      }
+    }
+    
+    // Batch restore media
+    function batchRestoreMedia() {
+      Array.from(selectedMedia).forEach(mediaId => {
+        const mediaIndex = media.trash.findIndex(p => p.id === mediaId);
+        if (mediaIndex !== -1) {
+          const item = media.trash.splice(mediaIndex, 1)[0];
+          
+          // Restore to original section
+          if (item.type === 'screenshot') {
+            media.screenshots.push(item);
+          } else {
+            media.gallery.push(item);
+          }
+          
+          // Restore to favorites if it was there
+          if (item.favorite) {
+            media.favorites.push({...item});
+          }
+        }
+      });
+      
+      saveMediaToStorage();
+      renderMedia();
+      cancelBatchSelection();
+    }
+    
+    // Batch permanent delete media
+    function batchPermanentDeleteMedia() {
+      const confirmMessage = selectedMedia.size === 1 
+        ? 'Deseja excluir permanentemente esta mídia?' 
+        : `Deseja excluir permanentemente ${selectedMedia.size} mídias?`;
+        
+      if (confirm(confirmMessage)) {
+        Array.from(selectedMedia).forEach(mediaId => {
+          media.trash = media.trash.filter(p => p.id !== mediaId);
+        });
+        
+        saveMediaToStorage();
+        renderMedia();
+        cancelBatchSelection();
+      }
+    }
+    
+    // Cancel batch selection
+    function cancelBatchSelection() {
+      selectedMedia.clear();
+      updateMediaSelection();
+      updateSelectAllCheckbox();
+      updateBatchActions();
+    }
+    
+    // Switch between sections
+    function switchSection(section) {
+      currentSection = section;
+      cancelBatchSelection();
+      
+      // Update sidebar buttons
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-section') === section) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Update section title
+      const titles = {
+        gallery: 'Galeria',
+        favorites: 'Favoritos',
+        screenshots: 'Capturas de Tela',
+        trash: 'Lixeira'
+      };
+      document.getElementById('sectionTitle').textContent = titles[section];
+      
+      // Hide all sections
+      document.querySelectorAll('.gallery-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      
+      // Show selected section with animation
+      setTimeout(() => {
+        document.getElementById(`${section}Section`).classList.add('active');
+        renderMedia();
+      }, 50);
+    }
+    
+    // Import media
+    function importMedia() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.multiple = true;
+      
+      input.onchange = (e) => {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+          const reader = new FileReader();
+          
+          reader.onload = (event) => {
+            const mediaItem = {
+              id: Date.now() + Math.random(),
+              name: file.name,
+              src: event.target.result,
+              date: new Date(file.lastModified).toISOString(),
+              size: file.size,
+              favorite: false,
+              type: 'image'
+            };
+            
+            media.gallery.push(mediaItem);
+            saveMediaToStorage();
+          };
+          
+          reader.readAsDataURL(file);
+        });
+        
+        // Wait for all files to be processed
+        setTimeout(() => {
+          renderMedia();
+        }, 500);
+      };
+      
+      input.click();
+    }
+    
+    // Render media
+    function renderMedia(searchTerm = '') {
+      const container = document.getElementById(`${currentSection}Photos`);
+      container.innerHTML = '';
+      
+      let mediaToRender = media[currentSection];
+      
+      // Filter by search term
+      if (searchTerm) {
+        mediaToRender = mediaToRender.filter(item => 
+          item.name.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Update count
+      const countElement = document.getElementById(`${currentSection}Count`);
+      if (currentSection === 'gallery') {
+        countElement.textContent = `${mediaToRender.length} mídias`;
+      } else if (currentSection === 'favorites') {
+        countElement.textContent = `${mediaToRender.length} mídias favoritas`;
+      } else if (currentSection === 'screenshots') {
+        countElement.textContent = `${mediaToRender.length} capturas de tela`;
+      } else if (currentSection === 'trash') {
+        countElement.textContent = `${mediaToRender.length} mídias na lixeira`;
+      }
+      
+      // Group media by date
+      const groupedMedia = groupMediaByDate(mediaToRender);
+      
+      // Render grouped media
+      if (Object.keys(groupedMedia).length === 0) {
+        renderEmptyState(container);
+      } else {
+        Object.keys(groupedMedia).forEach(date => {
+          const dateSection = createDateSection(date);
+          container.appendChild(dateSection);
+          
+          const mediaContainer = document.createElement('div');
+          mediaContainer.className = currentView === 'grid' ? 'gallery-grid' : 'gallery-list';
+          
+          groupedMedia[date].forEach(item => {
+            const mediaElement = createMediaElement(item);
+            mediaContainer.appendChild(mediaElement);
+          });
+          
+          container.appendChild(mediaContainer);
+        });
+      }
+      
+      updateSelectAllCheckbox();
+    }
+    
+    // Group media by date
+    function groupMediaByDate(mediaArray) {
+      const grouped = {};
+      
+      mediaArray.forEach(item => {
+        const date = new Date(item.date);
+        const dateStr = formatDate(date);
+        
+        if (!grouped[dateStr]) {
+          grouped[dateStr] = [];
+        }
+        
+        grouped[dateStr].push(item);
+      });
+      
+      return grouped;
+    }
+    
+    // Format date
+    function formatDate(date) {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return 'Hoje';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return 'Ontem';
+      } else {
+        return date.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+        });
+      }
+    }
+    
+    // Create date section
+    function createDateSection(date) {
+      const section = document.createElement('div');
+      section.className = 'date-section';
+      
+      const header = document.createElement('div');
+      header.className = 'date-header';
+      header.innerHTML = `
+        ${date}
+        <div class="date-separator"></div>
+      `;
+      
+      section.appendChild(header);
+      return section;
+    }
+    
+    // Create media element
+    function createMediaElement(item) {
+      const element = document.createElement('div');
+      
+      if (currentView === 'grid') {
+        element.className = 'gallery-item animate-zoom-in';
+        element.dataset.id = item.id;
+        
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.name;
+        
+        const selected = document.createElement('div');
+        selected.className = 'gallery-item-selected';
+        selected.innerHTML = '<i class="fas fa-check"></i>';
+        
+        const info = document.createElement('div');
+        info.className = 'gallery-item-info';
+        info.innerHTML = `
+          <div>${item.name}</div>
+          <div>${new Date(item.date).toLocaleDateString('pt-BR')}</div>
+        `;
+        
+        // Add favorite badge if applicable
+        if (item.favorite) {
+          const favoriteBadge = document.createElement('div');
+          favoriteBadge.className = 'favorite-badge';
+          favoriteBadge.innerHTML = '<i class="fas fa-heart"></i>';
+          element.appendChild(favoriteBadge);
+        }
+        
+        // Add gaming badge for screenshots
+        if (item.type === 'screenshot') {
+          const gamingBadge = document.createElement('div');
+          gamingBadge.className = 'gaming-badge';
+          gamingBadge.textContent = 'SCREEN';
+          element.appendChild(gamingBadge);
+        }
+        
+        element.appendChild(img);
+        element.appendChild(selected);
+        element.appendChild(info);
+        
+        // Click to select/open viewer
+        element.addEventListener('click', (e) => {
+          if (e.ctrlKey || e.metaKey || selectedMedia.size > 0) {
+            // Multi-select mode
+            if (selectedMedia.has(item.id)) {
+              selectedMedia.delete(item.id);
+            } else {
+              selectedMedia.add(item.id);
+            }
+            updateMediaSelection();
+            updateSelectAllCheckbox();
+            updateBatchActions();
+          } else if (!e.target.closest('.gallery-item-selected') && 
+                     !e.target.closest('.favorite-badge') && 
+                     !e.target.closest('.gaming-badge')) {
+            openViewer(item);
+          }
+        });
+        
+        // Right-click to select
+        element.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (!selectedMedia.has(item.id)) {
+            selectedMedia.add(item.id);
+            updateMediaSelection();
+            updateSelectAllCheckbox();
+            updateBatchActions();
+          }
+        });
+      } else {
+        element.className = 'gallery-list-item animate-zoom-in';
+        element.dataset.id = item.id;
+        
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.name;
+        
+        const info = document.createElement('div');
+        info.className = 'gallery-list-item-info';
+        info.innerHTML = `
+          <div class="gallery-list-item-name">${item.name}</div>
+          <div class="gallery-list-item-date">${new Date(item.date).toLocaleDateString('pt-BR')} • ${formatFileSize(item.size)}</div>
+        `;
+        
+        // Add favorite badge if applicable
+        if (item.favorite) {
+          const favoriteBadge = document.createElement('div');
+          favoriteBadge.className = 'favorite-badge';
+          favoriteBadge.innerHTML = '<i class="fas fa-heart"></i>';
+          element.appendChild(favoriteBadge);
+        }
+        
+        // Add gaming badge for screenshots
+        if (item.type === 'screenshot') {
+          const gamingBadge = document.createElement('div');
+          gamingBadge.className = 'gaming-badge';
+          gamingBadge.textContent = 'SCREEN';
+          element.appendChild(gamingBadge);
+        }
+        
+        element.appendChild(img);
+        element.appendChild(info);
+        
+        // Click to select/open viewer
+        element.addEventListener('click', (e) => {
+          if (e.ctrlKey || e.metaKey || selectedMedia.size > 0) {
+            // Multi-select mode
+            if (selectedMedia.has(item.id)) {
+              selectedMedia.delete(item.id);
+            } else {
+              selectedMedia.add(item.id);
+            }
+            updateMediaSelection();
+            updateSelectAllCheckbox();
+            updateBatchActions();
+          } else {
+            openViewer(item);
+          }
+        });
+        
+        // Right-click to select
+        element.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (!selectedMedia.has(item.id)) {
+            selectedMedia.add(item.id);
+            updateMediaSelection();
+            updateSelectAllCheckbox();
+            updateBatchActions();
+          }
+        });
+      }
+      
+      // Update selection state
+      if (selectedMedia.has(item.id)) {
+        element.classList.add('selected');
+      }
+      
+      return element;
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      else if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
+      else if (bytes < 1073741824) return Math.round(bytes / 1048576) + ' MB';
+      else return Math.round(bytes / 1073741824) + ' GB';
+    }
+    
+    // Render empty state
+    function renderEmptyState(container) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      
+      let icon, title, description;
+      
+      if (currentSection === 'gallery') {
+        icon = 'fas fa-images';
+        title = 'Nenhuma mídia encontrada';
+        description = 'Importe fotos e imagens para começar a visualizá-las aqui.';
+      } else if (currentSection === 'favorites') {
+        icon = 'fas fa-heart';
+        title = 'Nenhuma mídia favorita';
+        description = 'Adicione mídias aos favoritos para vê-las aqui.';
+      } else if (currentSection === 'screenshots') {
+        icon = 'fas fa-camera';
+        title = 'Nenhuma captura de tela';
+        description = 'Suas capturas de tela aparecerão aqui.';
+      } else if (currentSection === 'trash') {
+        icon = 'fas fa-trash';
+        title = 'Lixeira vazia';
+        description = 'As mídias excluídas aparecerão aqui.';
+      }
+      
+      emptyState.innerHTML = `
+        <div class="empty-state-icon">
+          <i class="${icon}"></i>
+        </div>
+        <div class="empty-state-title">${title}</div>
+        <div class="empty-state-description">${description}</div>
+      `;
+      
+      container.appendChild(emptyState);
+    }
+    
+    // Update media selection
+    function updateMediaSelection() {
+      document.querySelectorAll('.gallery-item, .gallery-list-item').forEach(item => {
+        const id = parseFloat(item.dataset.id);
+        if (selectedMedia.has(id)) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+    
+    // Update select all checkbox
+    function updateSelectAllCheckbox() {
+      const selectAllCheckbox = document.getElementById('selectAll');
+      const mediaInSection = media[currentSection];
+      const selectedInSection = Array.from(selectedMedia).filter(id => 
+        mediaInSection.some(item => item.id === id)
+      );
+      
+      selectAllCheckbox.checked = mediaInSection.length > 0 && selectedInSection.length === mediaInSection.length;
+      selectAllCheckbox.indeterminate = selectedInSection.length > 0 && selectedInSection.length < mediaInSection.length;
+    }
+    
+    // Show context menu
+    function showContextMenu(e) {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaElement = e.target.closest('.gallery-item, .gallery-list-item');
+      const mediaId = parseFloat(mediaElement.dataset.id);
+      const mediaItem = [...media.gallery, ...media.favorites, ...media.screenshots, ...media.trash].find(p => p.id === mediaId);
+      
+      // Position context menu
+      contextMenu.style.left = `${e.pageX}px`;
+      contextMenu.style.top = `${e.pageY}px`;
+      contextMenu.style.display = 'block';
+      
+      // Update menu items based on section and media
+      const favoriteItem = document.getElementById('favoriteItem');
+      const deleteItem = document.getElementById('deleteItem');
+      const permanentDeleteItem = document.getElementById('permanentDeleteItem');
+      const restoreItem = document.getElementById('restoreItem');
+      
+      // Reset visibility
+      favoriteItem.style.display = 'flex';
+      deleteItem.style.display = 'flex';
+      permanentDeleteItem.style.display = 'none';
+      restoreItem.style.display = 'none';
+      
+      if (currentSection === 'trash') {
+        favoriteItem.style.display = 'none';
+        deleteItem.style.display = 'none';
+        permanentDeleteItem.style.display = 'flex';
+        restoreItem.style.display = 'flex';
+      } else if (mediaItem.favorite) {
+        favoriteItem.innerHTML = '<i class="fas fa-heart"></i><span>Remover dos favoritos</span>';
+      } else {
+        favoriteItem.innerHTML = '<i class="far fa-heart"></i><span>Favoritar</span>';
+      }
+      
+      // Store selected media for menu actions
+      contextMenu.dataset.mediaId = mediaId;
+    }
+    
+    // Hide context menu
+    function hideContextMenu() {
+      document.getElementById('contextMenu').style.display = 'none';
+    }
+    
+    // Toggle favorite
+    function toggleFavorite() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Find media in gallery or screenshots
+      const mediaItem = media.gallery.find(p => p.id === mediaId) || 
+                       media.screenshots.find(p => p.id === mediaId);
+      
+      if (mediaItem) {
+        mediaItem.favorite = !mediaItem.favorite;
+        
+        // Update favorites array
+        if (mediaItem.favorite) {
+          if (!media.favorites.some(p => p.id === mediaId)) {
+            media.favorites.push({...mediaItem});
+          }
+        } else {
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Edit media
+    function editMedia() {
+      alert('Função de edição em desenvolvimento');
+      hideContextMenu();
+    }
+    
+    // Share media
+    function shareMedia() {
+      alert('Função de compartilhamento em desenvolvimento');
+      hideContextMenu();
+    }
+    
+    // Set as wallpaper
+    function setWallpaper() {
+      alert('Função de papel de parede em desenvolvimento');
+      hideContextMenu();
+    }
+    
+    // Delete media
+    function deleteMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Move media to trash
+      const mediaIndex = media[currentSection].findIndex(p => p.id === mediaId);
+      if (mediaIndex !== -1) {
+        const item = media[currentSection].splice(mediaIndex, 1)[0];
+        media.trash.push(item);
+        
+        // Remove from favorites if it was there
+        media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Permanent delete media
+    function permanentDeleteMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Remove media permanently
+      media.trash = media.trash.filter(p => p.id !== mediaId);
+      
+      saveMediaToStorage();
+      renderMedia();
+      
+      hideContextMenu();
+    }
+    
+    // Restore media
+    function restoreMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Find media in trash
+      const mediaIndex = media.trash.findIndex(p => p.id === mediaId);
+      if (mediaIndex !== -1) {
+        const item = media.trash.splice(mediaIndex, 1)[0];
+        
+        // Restore to original section
+        if (item.type === 'screenshot') {
+          media.screenshots.push(item);
+        } else {
+          media.gallery.push(item);
+        }
+        
+        // Restore to favorites if it was there
+        if (item.favorite) {
+          media.favorites.push({...item});
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Empty trash
+    function emptyTrash() {
+      if (confirm('Tem certeza de que deseja esvaziar a lixeira permanentemente?')) {
+        media.trash = [];
+        saveMediaToStorage();
+        renderMedia();
+      }
+    }
+    
+    // Open viewer
+    function openViewer(mediaItem) {
+      const viewer = document.getElementById('fullscreenViewer');
+      const viewerImage = document.getElementById('viewerImage');
+      
+      viewerImage.src = mediaItem.src;
+      viewerImage.alt = mediaItem.name;
+      viewer.dataset.mediaId = mediaItem.id;
+      
+      // Set up viewer media array for navigation
+      if (currentSection === 'favorites') {
+        viewerMediaArray = [...media.favorites];
+      } else if (currentSection === 'screenshots') {
+        viewerMediaArray = [...media.screenshots];
+      } else if (currentSection === 'trash') {
+        viewerMediaArray = [...media.trash];
+      } else {
+        viewerMediaArray = [...media.gallery];
+      }
+      
+      // Find current index
+      viewerIndex = viewerMediaArray.findIndex(item => item.id === mediaItem.id);
+      
+      // Update favorite button
+      const favoriteBtn = document.getElementById('viewerFavorite');
+      if (mediaItem.favorite) {
+        favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+      } else {
+        favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+      }
+      
+      viewer.classList.add('active');
+    }
+    
+    // Close viewer
+    function closeViewer() {
+      document.getElementById('fullscreenViewer').classList.remove('active');
+    }
+    
+    // Previous media in viewer
+    function previousMedia() {
+      if (viewerMediaArray.length === 0) return;
+      
+      viewerIndex = (viewerIndex - 1 + viewerMediaArray.length) % viewerMediaArray.length;
+      const prevMedia = viewerMediaArray[viewerIndex];
+      
+      if (prevMedia) {
+        openViewer(prevMedia);
+      }
+    }
+    
+    // Next media in viewer
+    function nextMedia() {
+      if (viewerMediaArray.length === 0) return;
+      
+      viewerIndex = (viewerIndex + 1) % viewerMediaArray.length;
+      const nextMedia = viewerMediaArray[viewerIndex];
+      
+      if (nextMedia) {
+        openViewer(nextMedia);
+      }
+    }
+    
+    // Toggle favorite in viewer
+    function toggleFavoriteInViewer() {
+      const viewer = document.getElementById('fullscreenViewer');
+      const mediaId = parseFloat(viewer.dataset.mediaId);
+      
+      // Find media in gallery or screenshots
+      const mediaItem = media.gallery.find(p => p.id === mediaId) || 
+                       media.screenshots.find(p => p.id === mediaId);
+      
+      if (mediaItem) {
+        mediaItem.favorite = !mediaItem.favorite;
+        
+        // Update favorites array
+        if (mediaItem.favorite) {
+          if (!media.favorites.some(p => p.id === mediaId)) {
+            media.favorites.push({...mediaItem});
+          }
+        } else {
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+        
+        // Update favorite button
+        const favoriteBtn = document.getElementById('viewerFavorite');
+        if (mediaItem.favorite) {
+          favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+          favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+    }
+    
+    // Edit media in viewer
+    function editMediaInViewer() {
+      alert('Função de edição em desenvolvimento');
+    }
+    
+    // Zoom in
+    function zoomIn() {
+      const viewerImage = document.getElementById('viewerImage');
+      const currentTransform = viewerImage.style.transform || '';
+      const currentScale = currentTransform.match(/scale\(([\d.]+)\)/) ? parseFloat(RegExp.$1) : 1;
+      const newScale = Math.min(currentScale * 1.2, 5);
+      viewerImage.style.transform = `scale(${newScale})`;
+    }
+    
+    // Zoom out
+    function zoomOut() {
+      const viewerImage = document.getElementById('viewerImage');
+      const currentTransform = viewerImage.style.transform || '';
+      const currentScale = currentTransform.match(/scale\(([\d.]+)\)/) ? parseFloat(RegExp.$1) : 1;
+      const newScale = Math.max(currentScale / 1.2, 0.5);
+      viewerImage.style.transform = `scale(${newScale})`;
+    }
+    
+    // Rotate media
+    function rotateMedia() {
+      const viewerImage = document.getElementById('viewerImage');
+      const currentTransform = viewerImage.style.transform || '';
+      const currentRotate = currentTransform.match(/rotate\(([\d.]+)deg\)/) ? parseFloat(RegExp.$1) : 0;
+      const newRotate = (currentRotate + 90) % 360;
+      
+      const scaleMatch = currentTransform.match(/scale\(([\d.]+)\)/);
+      const scale = scaleMatch ? `scale(${scaleMatch[1]})` : '';
+      
+      viewerImage.style.transform = `${scale} rotate(${newRotate}deg)`;
+    }
+    
+    // Open filters
+    function openFilters() {
+      alert('Função de filtros em desenvolvimento');
+    }
+    
+    // Share media in viewer
+    function shareMediaInViewer() {
+      alert('Função de compartilhamento em desenvolvimento');
+    }
+    
+    // Download media
+    function downloadMedia() {
+      const viewer = document.getElementById('fullscreenViewer');
+      const mediaId = parseFloat(viewer.dataset.mediaId);
+      
+      // Find media
+      const mediaItem = [...media.gallery, ...media.favorites, ...media.screenshots, ...media.trash].find(p => p.id === mediaId);
+      
+      if (mediaItem) {
+        const link = document.createElement('a');
+        link.href = mediaItem.src;
+        link.download = mediaItem.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+    
+    // Delete media in viewer
+    function deleteMediaInViewer() {
+      const viewer = document.getElementById('fullscreenViewer');
+      const mediaId = parseFloat(viewer.dataset.mediaId);
+      
+      if (currentSection === 'trash') {
+        // Permanent delete
+        media.trash = media.trash.filter(p => p.id !== mediaId);
+      } else {
+        // Move to trash
+        const mediaIndex = media[currentSection].findIndex(p => p.id === mediaId);
+        if (mediaIndex !== -1) {
+          const item = media[currentSection].splice(mediaIndex, 1)[0];
+          media.trash.push(item);
+          
+          // Remove from favorites if it was there
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+      }
+      
+      saveMediaToStorage();
+      renderMedia();
+      closeViewer();
+    }
+    
+    // Start slideshow
+    function startSlideshow() {
+      if (media[currentSection].length === 0) {
+        alert('Nenhuma mídia disponível para apresentação');
+        return;
+      }
+      
+      openViewer(media[currentSection][0]);
+      
+      // Auto-advance every 3 seconds
+      const slideshowInterval = setInterval(() => {
+        if (!document.getElementById('fullscreenViewer').classList.contains('active')) {
+          clearInterval(slideshowInterval);
+          return;
+        }
+        
+        nextMedia();
+      }, 3000);
+    }
+    
+    // Simulate updating stats
+    function updateStats() {
+      // Update header stats
+      const headerCpu = document.getElementById('headerCpu');
+      if (headerCpu) {
+        const currentCpu = parseFloat(headerCpu.textContent);
+        const newCpu = Math.max(0, Math.min(100, currentCpu + (Math.random() * 4 - 2)));
+        headerCpu.textContent = `${newCpu.toFixed(0)}%`;
+      }
+      
+      const headerMem = document.getElementById('headerMem');
+      if (headerMem) {
+        const currentMem = parseFloat(headerMem.textContent);
+        const newMem = Math.max(0, Math.min(100, currentMem + (Math.random() * 4 - 2)));
+        headerMem.textContent = `${newMem.toFixed(0)}%`;
+      }
+      
+      const headerGpu = document.getElementById('headerGpu');
+      if (headerGpu) {
+        const currentGpu = parseFloat(headerGpu.textContent);
+        const newGpu = Math.max(0, Math.min(100, currentGpu + (Math.random() * 4 - 2)));
+        headerGpu.textContent = `${newGpu.toFixed(0)}%`;
+      }
+    }
+    
+    // Update stats every 3 seconds
+    setInterval(updateStats, 3000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexus Gallery Green - Visualização Eficiente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Green theme colors */
+      --primary: #00ff88;
+      --primary-dark: #00cc6a;
+      --secondary: #00d4aa;
+      --accent: #00ffcc;
+      --dark: #0a0f0c;
+      --darker: #050806;
+      --light: #e0f2ea;
+      --gray: #6b8070;
+      --success: #00ff88;
+      --warning: #ccff00;
+      --danger: #ff0066;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #050806, #0a140f, #05100d);
+      color: var(--light);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    
+    /* Simple static background - no animations */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 50%);
+      z-index: -1;
+    }
+    
+    .font-orbitron {
+      font-family: 'Orbitron', monospace;
+    }
+    
+    /* Simple glass effect */
+    .glass {
+      background: rgba(10, 15, 12, 0.7);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 15, 12, 0.5);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Main container */
+    .app-container {
+      width: 100%;
+      height: 100vh;
+      background: rgba(5, 8, 6, 0.9);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 15, 12, 0.8);
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      font-size: 24px;
+      color: var(--dark);
+    }
+    
+    .app-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .system-stats {
+      display: flex;
+      gap: 24px;
+    }
+    
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(0, 255, 136, 0.1);
+      border-radius: 8px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .stat-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    
+    /* App Content */
+    .app-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      width: 80px;
+      background: rgba(10, 15, 12, 0.5);
+      border-right: 1px solid rgba(0, 255, 136, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      gap: 20px;
+    }
+    
+    .sidebar-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 22px;
+      position: relative;
+    }
+    
+    .sidebar-btn:hover {
+      background: rgba(0, 255, 136, 0.1);
+    }
+    
+    .sidebar-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--dark);
+    }
+    
+    /* Gallery Container */
+    .gallery-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Gallery Header */
+    .gallery-header {
+      padding: 20px;
+      background: rgba(10, 15, 12, 0.6);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .gallery-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .gallery-title i {
+      color: var(--primary);
+      font-size: 24px;
+    }
+    
+    .gallery-search {
+      flex: 1;
+      max-width: 500px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      background: rgba(10, 15, 12, 0.7);
+      color: var(--light);
+      font-size: 14px;
+      outline: none;
+    }
+    
+    .gallery-search:focus {
+      border-color: var(--primary);
+    }
+    
+    .gallery-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .action-btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--light);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    
+    .action-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--dark);
+    }
+    
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.05);
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    
+    .icon-btn:hover {
+      background: rgba(0, 255, 136, 0.1);
+    }
+    
+    .icon-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--dark);
+    }
+    
+    /* Gallery Content */
+    .gallery-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    
+    .gallery-section {
+      margin-bottom: 32px;
+    }
+    
+    .gallery-info {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .gallery-count {
+      font-size: 16px;
+      color: var(--gray);
+    }
+    
+    /* Gallery Date Section */
+    .date-section {
+      margin-bottom: 32px;
+    }
+    
+    .date-header {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .date-separator {
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 255, 136, 0.3);
+      margin-left: 16px;
+    }
+    
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    
+    /* Gallery List */
+    .gallery-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .gallery-list-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(10, 15, 12, 0.5);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      cursor: pointer;
+    }
+    
+    .gallery-list-item:hover {
+      background: rgba(0, 255, 136, 0.1);
+    }
+    
+    .gallery-list-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .gallery-list-item-info {
+      flex: 1;
+    }
+    
+    .gallery-list-item-name {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+    
+    .gallery-list-item-date {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    
+    .gallery-item {
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(10, 15, 12, 0.5);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      cursor: pointer;
+      aspect-ratio: 4/3;
+      position: relative;
+    }
+    
+    .gallery-item:hover {
+      border-color: var(--primary);
+    }
+    
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .gallery-item-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 255, 136, 0.05);
+      color: var(--gray);
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .gallery-item-selected {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+    
+    .gallery-item.selected .gallery-item-selected {
+      opacity: 1;
+    }
+    
+    .gallery-list-item.selected {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: var(--primary);
+    }
+    
+    /* Gallery Item Info */
+    .gallery-item-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      color: white;
+      font-size: 14px;
+      opacity: 0;
+    }
+    
+    .gallery-item:hover .gallery-item-info {
+      opacity: 1;
+    }
+    
+    /* Gaming badges */
+    .gaming-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+    
+    .favorite-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 0, 102, 0.8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Context Menu */
+    .context-menu {
+      position: absolute;
+      background: rgba(10, 15, 12, 0.9);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px;
+      z-index: 1000;
+      min-width: 200px;
+      display: none;
+      overflow: hidden;
+    }
+    
+    .context-menu-item {
+      padding: 14px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--light);
+    }
+    
+    .context-menu-item:hover {
+      background: rgba(0, 255, 136, 0.1);
+    }
+    
+    .context-menu-item.danger {
+      color: var(--danger);
+    }
+    
+    .context-menu-separator {
+      height: 1px;
+      background: rgba(0, 255, 136, 0.3);
+      margin: 6px 0;
+    }
+    
+    /* Fullscreen Viewer - Simplified */
+    .fullscreen-viewer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .fullscreen-viewer.active {
+      display: flex;
+    }
+    
+    .viewer-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+    }
+    
+    .viewer-image {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+    
+    .viewer-controls {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      background: rgba(10, 15, 12, 0.8);
+      padding: 16px 24px;
+      border-radius: 30px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .viewer-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 255, 136, 0.2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    
+    .viewer-btn:hover {
+      background: rgba(0, 255, 136, 0.4);
+    }
+    
+    .viewer-close {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 0, 102, 0.8);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    
+    .viewer-close:hover {
+      background: rgba(255, 0, 102, 1);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 60px;
+      text-align: center;
+      color: var(--gray);
+    }
+    
+    .empty-state-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      color: var(--primary);
+    }
+    
+    .empty-state-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--light);
+    }
+    
+    .empty-state-description {
+      margin-bottom: 32px;
+      max-width: 500px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+      }
+      
+      .sidebar-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      
+      .gallery-search {
+        max-width: 200px;
+      }
+      
+      .action-btn span {
+        display: none;
+      }
+      
+      .system-stats {
+        display: none;
+      }
+      
+      .app-title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="fas fa-images"></i>
+        </div>
+        <div class="app-title">NEXUS GALLERY GREEN</div>
+      </div>
+      
+      <div class="system-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="headerCpu">1%</div>
+          <div class="stat-label">CPU</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerMem">44%</div>
+          <div class="stat-label">RAM</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="headerGpu">0%</div>
+          <div class="stat-label">GPU</div>
+        </div>
+      </div>
+    </header>
+    
+    <!-- App Content -->
+    <div class="app-content">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <button class="sidebar-btn active" title="Galeria" data-section="gallery">
+          <i class="fas fa-images"></i>
+        </button>
+        <button class="sidebar-btn" title="Favoritos" data-section="favorites">
+          <i class="fas fa-heart"></i>
+        </button>
+        <button class="sidebar-btn" title="Capturas de Tela" data-section="screenshots">
+          <i class="fas fa-camera"></i>
+        </button>
+        <button class="sidebar-btn" title="Lixeira" data-section="trash">
+          <i class="fas fa-trash"></i>
+        </button>
+        
+        <div class="sidebar-btn" title="Modo Econômico" style="margin-top: auto; background: linear-gradient(135deg, var(--primary), var(--secondary));">
+          <i class="fas fa-leaf"></i>
+        </div>
+      </div>
+      
+      <!-- Gallery Container -->
+      <div class="gallery-container">
+        <!-- Gallery Header -->
+        <div class="gallery-header">
+          <div class="gallery-title">
+            <i class="fas fa-images"></i>
+            <span id="sectionTitle">Galeria</span>
+          </div>
+          <input type="text" class="gallery-search" id="searchInput" placeholder="Pesquisar mídias...">
+          <div class="gallery-actions">
+            <button class="action-btn primary" id="importBtn">
+              <i class="fas fa-plus"></i>
+              <span>Importar</span>
+            </button>
+            <button class="icon-btn" id="viewListBtn" title="Exibir como lista">
+              <i class="fas fa-list"></i>
+            </button>
+            <button class="icon-btn active" id="viewGridBtn" title="Exibir como grade">
+              <i class="fas fa-th"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Gallery Content -->
+        <div class="gallery-content" id="galleryContent">
+          <!-- Gallery Section -->
+          <div class="gallery-section" id="gallerySection">
+            <div class="gallery-info">
+              <div class="gallery-count" id="galleryCount">0 mídias</div>
+            </div>
+            <div id="galleryPhotos"></div>
+          </div>
+          
+          <!-- Favorites Section -->
+          <div class="gallery-section" id="favoritesSection" style="display: none;">
+            <div class="gallery-info">
+              <div class="gallery-count" id="favoritesCount">0 mídias favoritas</div>
+            </div>
+            <div id="favoritesPhotos"></div>
+          </div>
+          
+          <!-- Screenshots Section -->
+          <div class="gallery-section" id="screenshotsSection" style="display: none;">
+            <div class="gallery-info">
+              <div class="gallery-count" id="screenshotsCount">0 capturas de tela</div>
+            </div>
+            <div id="screenshotsPhotos"></div>
+          </div>
+          
+          <!-- Trash Section -->
+          <div class="gallery-section" id="trashSection" style="display: none;">
+            <div class="gallery-info">
+              <div class="gallery-count" id="trashCount">0 mídias na lixeira</div>
+              <div class="gallery-controls">
+                <button class="action-btn" id="emptyTrashBtn">
+                  <i class="fas fa-trash-alt"></i>
+                  <span>Esvaziar lixeira</span>
+                </button>
+              </div>
+            </div>
+            <div id="trashPhotos"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Context Menu -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" id="favoriteItem">
+      <i class="fas fa-heart"></i>
+      <span>Favoritar</span>
+    </div>
+    <div class="context-menu-item" id="deleteItem">
+      <i class="fas fa-trash"></i>
+      <span>Excluir</span>
+    </div>
+    <div class="context-menu-item danger" id="permanentDeleteItem" style="display: none;">
+      <i class="fas fa-trash-alt"></i>
+      <span>Excluir permanentemente</span>
+    </div>
+    <div class="context-menu-item" id="restoreItem" style="display: none;">
+      <i class="fas fa-undo"></i>
+      <span>Restaurar</span>
+    </div>
+  </div>
+  
+  <!-- Fullscreen Viewer - Simplified -->
+  <div class="fullscreen-viewer" id="fullscreenViewer">
+    <div class="viewer-content">
+      <img src="" alt="" class="viewer-image" id="viewerImage">
+      <button class="viewer-close" id="viewerClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="viewer-controls">
+        <button class="viewer-btn" id="viewerFavorite">
+          <i class="far fa-heart"></i>
+        </button>
+        <button class="viewer-btn" id="viewerDelete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Media data structure
+    let media = {
+      gallery: [],
+      favorites: [],
+      screenshots: [],
+      trash: []
+    };
+    
+    let currentSection = 'gallery';
+    let currentView = 'grid';
+    
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMediaFromStorage();
+      renderMedia();
+      setupEventListeners();
+      
+      // Add some sample media if empty
+      if (media.gallery.length === 0) {
+        addSampleMedia();
+      }
+    });
+    
+    // Load media from localStorage
+    function loadMediaFromStorage() {
+      const savedMedia = localStorage.getItem('nexusGalleryMedia');
+      if (savedMedia) {
+        media = JSON.parse(savedMedia);
+      }
+    }
+    
+    // Save media to localStorage
+    function saveMediaToStorage() {
+      localStorage.setItem('nexusGalleryMedia', JSON.stringify(media));
+    }
+    
+    // Add sample media for demonstration
+    function addSampleMedia() {
+      const sampleMedia = [
+        {
+          id: Date.now() + Math.random(),
+          name: 'Gamer Setup.jpg',
+          src: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 86400000).toISOString(),
+          size: 2457600,
+          favorite: true,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 1,
+          name: 'Battle Station.png',
+          src: 'https://images.unsplash.com/photo-1593640408182-31c70c819896?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 172800000).toISOString(),
+          size: 3891200,
+          favorite: false,
+          type: 'image'
+        },
+        {
+          id: Date.now() + Math.random() + 2,
+          name: 'RGB Lighting.jpg',
+          src: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+          date: new Date(Date.now() - 259200000).toISOString(),
+          size: 3145728,
+          favorite: true,
+          type: 'image'
+        }
+      ];
+      
+      // Add to gallery
+      media.gallery = [...sampleMedia];
+      
+      // Add favorites
+      media.favorites = sampleMedia.filter(item => item.favorite);
+      
+      saveMediaToStorage();
+      renderMedia();
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Sidebar navigation
+      const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+      sidebarBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const section = this.getAttribute('data-section');
+          if (section) {
+            switchSection(section);
+          }
+        });
+      });
+      
+      // View toggle
+      document.getElementById('viewGridBtn').addEventListener('click', () => {
+        currentView = 'grid';
+        document.getElementById('viewGridBtn').classList.add('active');
+        document.getElementById('viewListBtn').classList.remove('active');
+        renderMedia();
+      });
+      
+      document.getElementById('viewListBtn').addEventListener('click', () => {
+        currentView = 'list';
+        document.getElementById('viewListBtn').classList.add('active');
+        document.getElementById('viewGridBtn').classList.remove('active');
+        renderMedia();
+      });
+      
+      // Import media
+      document.getElementById('importBtn').addEventListener('click', importMedia);
+      
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        renderMedia(searchTerm);
+      });
+      
+      // Context menu
+      document.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.gallery-item') || e.target.closest('.gallery-list-item')) {
+          e.preventDefault();
+          showContextMenu(e);
+        } else {
+          hideContextMenu();
+        }
+      });
+      
+      document.addEventListener('click', () => {
+        hideContextMenu();
+      });
+      
+      // Context menu actions
+      document.getElementById('favoriteItem').addEventListener('click', toggleFavorite);
+      document.getElementById('deleteItem').addEventListener('click', deleteMedia);
+      document.getElementById('permanentDeleteItem').addEventListener('click', permanentDeleteMedia);
+      document.getElementById('restoreItem').addEventListener('click', restoreMedia);
+      
+      // Empty trash
+      document.getElementById('emptyTrashBtn').addEventListener('click', emptyTrash);
+      
+      // Fullscreen viewer
+      document.getElementById('viewerClose').addEventListener('click', closeViewer);
+      document.getElementById('viewerFavorite').addEventListener('click', toggleFavoriteInViewer);
+      document.getElementById('viewerDelete').addEventListener('click', deleteMediaInViewer);
+      
+      // Keyboard navigation in viewer
+      document.addEventListener('keydown', (e) => {
+        if (!document.getElementById('fullscreenViewer').classList.contains('active')) return;
+        
+        if (e.key === 'Escape') {
+          closeViewer();
+        }
+      });
+    }
+    
+    // Switch between sections
+    function switchSection(section) {
+      currentSection = section;
+      
+      // Update sidebar buttons
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-section') === section) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Update section title
+      const titles = {
+        gallery: 'Galeria',
+        favorites: 'Favoritos',
+        screenshots: 'Capturas de Tela',
+        trash: 'Lixeira'
+      };
+      document.getElementById('sectionTitle').textContent = titles[section];
+      
+      // Hide all sections
+      document.querySelectorAll('.gallery-section').forEach(sec => {
+        sec.style.display = 'none';
+      });
+      
+      // Show selected section
+      document.getElementById(`${section}Section`).style.display = 'block';
+      renderMedia();
+    }
+    
+    // Import media
+    function importMedia() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.multiple = true;
+      
+      input.onchange = (e) => {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+          const reader = new FileReader();
+          
+          reader.onload = (event) => {
+            const mediaItem = {
+              id: Date.now() + Math.random(),
+              name: file.name,
+              src: event.target.result,
+              date: new Date(file.lastModified).toISOString(),
+              size: file.size,
+              favorite: false,
+              type: 'image'
+            };
+            
+            media.gallery.push(mediaItem);
+            saveMediaToStorage();
+          };
+          
+          reader.readAsDataURL(file);
+        });
+        
+        // Wait for all files to be processed
+        setTimeout(() => {
+          renderMedia();
+        }, 500);
+      };
+      
+      input.click();
+    }
+    
+    // Render media
+    function renderMedia(searchTerm = '') {
+      const container = document.getElementById(`${currentSection}Photos`);
+      container.innerHTML = '';
+      
+      let mediaToRender = media[currentSection];
+      
+      // Filter by search term
+      if (searchTerm) {
+        mediaToRender = mediaToRender.filter(item => 
+          item.name.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Update count
+      const countElement = document.getElementById(`${currentSection}Count`);
+      if (currentSection === 'gallery') {
+        countElement.textContent = `${mediaToRender.length} mídias`;
+      } else if (currentSection === 'favorites') {
+        countElement.textContent = `${mediaToRender.length} mídias favoritas`;
+      } else if (currentSection === 'screenshots') {
+        countElement.textContent = `${mediaToRender.length} capturas de tela`;
+      } else if (currentSection === 'trash') {
+        countElement.textContent = `${mediaToRender.length} mídias na lixeira`;
+      }
+      
+      // Group media by date
+      const groupedMedia = groupMediaByDate(mediaToRender);
+      
+      // Render grouped media
+      if (Object.keys(groupedMedia).length === 0) {
+        renderEmptyState(container);
+      } else {
+        Object.keys(groupedMedia).forEach(date => {
+          const dateSection = createDateSection(date);
+          container.appendChild(dateSection);
+          
+          const mediaContainer = document.createElement('div');
+          mediaContainer.className = currentView === 'grid' ? 'gallery-grid' : 'gallery-list';
+          
+          groupedMedia[date].forEach(item => {
+            const mediaElement = createMediaElement(item);
+            mediaContainer.appendChild(mediaElement);
+          });
+          
+          container.appendChild(mediaContainer);
+        });
+      }
+    }
+    
+    // Group media by date
+    function groupMediaByDate(mediaArray) {
+      const grouped = {};
+      
+      mediaArray.forEach(item => {
+        const date = new Date(item.date);
+        const dateStr = formatDate(date);
+        
+        if (!grouped[dateStr]) {
+          grouped[dateStr] = [];
+        }
+        
+        grouped[dateStr].push(item);
+      });
+      
+      return grouped;
+    }
+    
+    // Format date
+    function formatDate(date) {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (date.toDateString() === today.toDateString()) {
+        return 'Hoje';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return 'Ontem';
+      } else {
+        return date.toLocaleDateString('pt-BR', {
+          day: 'numeric',
+          month: 'long',
+          year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+        });
+      }
+    }
+    
+    // Create date section
+    function createDateSection(date) {
+      const section = document.createElement('div');
+      section.className = 'date-section';
+      
+      const header = document.createElement('div');
+      header.className = 'date-header';
+      header.innerHTML = `
+        ${date}
+        <div class="date-separator"></div>
+      `;
+      
+      section.appendChild(header);
+      return section;
+    }
+    
+    // Create media element
+    function createMediaElement(item) {
+      const element = document.createElement('div');
+      
+      if (currentView === 'grid') {
+        element.className = 'gallery-item';
+        element.dataset.id = item.id;
+        
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.name;
+        
+        const selected = document.createElement('div');
+        selected.className = 'gallery-item-selected';
+        selected.innerHTML = '<i class="fas fa-check"></i>';
+        
+        const info = document.createElement('div');
+        info.className = 'gallery-item-info';
+        info.innerHTML = `
+          <div>${item.name}</div>
+          <div>${new Date(item.date).toLocaleDateString('pt-BR')}</div>
+        `;
+        
+        // Add favorite badge if applicable
+        if (item.favorite) {
+          const favoriteBadge = document.createElement('div');
+          favoriteBadge.className = 'favorite-badge';
+          favoriteBadge.innerHTML = '<i class="fas fa-heart"></i>';
+          element.appendChild(favoriteBadge);
+        }
+        
+        // Add gaming badge for screenshots
+        if (item.type === 'screenshot') {
+          const gamingBadge = document.createElement('div');
+          gamingBadge.className = 'gaming-badge';
+          gamingBadge.textContent = 'SCREEN';
+          element.appendChild(gamingBadge);
+        }
+        
+        element.appendChild(img);
+        element.appendChild(selected);
+        element.appendChild(info);
+        
+        // Click to open viewer
+        element.addEventListener('click', (e) => {
+          if (!e.target.closest('.gallery-item-selected') && 
+              !e.target.closest('.favorite-badge') && 
+              !e.target.closest('.gaming-badge')) {
+            openViewer(item);
+          }
+        });
+      } else {
+        element.className = 'gallery-list-item';
+        element.dataset.id = item.id;
+        
+        const img = document.createElement('img');
+        img.src = item.src;
+        img.alt = item.name;
+        
+        const info = document.createElement('div');
+        info.className = 'gallery-list-item-info';
+        info.innerHTML = `
+          <div class="gallery-list-item-name">${item.name}</div>
+          <div class="gallery-list-item-date">${new Date(item.date).toLocaleDateString('pt-BR')} • ${formatFileSize(item.size)}</div>
+        `;
+        
+        // Add favorite badge if applicable
+        if (item.favorite) {
+          const favoriteBadge = document.createElement('div');
+          favoriteBadge.className = 'favorite-badge';
+          favoriteBadge.innerHTML = '<i class="fas fa-heart"></i>';
+          element.appendChild(favoriteBadge);
+        }
+        
+        // Add gaming badge for screenshots
+        if (item.type === 'screenshot') {
+          const gamingBadge = document.createElement('div');
+          gamingBadge.className = 'gaming-badge';
+          gamingBadge.textContent = 'SCREEN';
+          element.appendChild(gamingBadge);
+        }
+        
+        element.appendChild(img);
+        element.appendChild(info);
+        
+        // Click to open viewer
+        element.addEventListener('click', (e) => {
+          openViewer(item);
+        });
+      }
+      
+      return element;
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      else if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
+      else if (bytes < 1073741824) return Math.round(bytes / 1048576) + ' MB';
+      else return Math.round(bytes / 1073741824) + ' GB';
+    }
+    
+    // Render empty state
+    function renderEmptyState(container) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      
+      let icon, title, description;
+      
+      if (currentSection === 'gallery') {
+        icon = 'fas fa-images';
+        title = 'Nenhuma mídia encontrada';
+        description = 'Importe fotos e imagens para começar a visualizá-las aqui.';
+      } else if (currentSection === 'favorites') {
+        icon = 'fas fa-heart';
+        title = 'Nenhuma mídia favorita';
+        description = 'Adicione mídias aos favoritos para vê-las aqui.';
+      } else if (currentSection === 'screenshots') {
+        icon = 'fas fa-camera';
+        title = 'Nenhuma captura de tela';
+        description = 'Suas capturas de tela aparecerão aqui.';
+      } else if (currentSection === 'trash') {
+        icon = 'fas fa-trash';
+        title = 'Lixeira vazia';
+        description = 'As mídias excluídas aparecerão aqui.';
+      }
+      
+      emptyState.innerHTML = `
+        <div class="empty-state-icon">
+          <i class="${icon}"></i>
+        </div>
+        <div class="empty-state-title">${title}</div>
+        <div class="empty-state-description">${description}</div>
+      `;
+      
+      container.appendChild(emptyState);
+    }
+    
+    // Show context menu
+    function showContextMenu(e) {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaElement = e.target.closest('.gallery-item, .gallery-list-item');
+      const mediaId = parseFloat(mediaElement.dataset.id);
+      const mediaItem = [...media.gallery, ...media.favorites, ...media.screenshots, ...media.trash].find(p => p.id === mediaId);
+      
+      // Position context menu
+      contextMenu.style.left = `${e.pageX}px`;
+      contextMenu.style.top = `${e.pageY}px`;
+      contextMenu.style.display = 'block';
+      
+      // Update menu items based on section and media
+      const favoriteItem = document.getElementById('favoriteItem');
+      const deleteItem = document.getElementById('deleteItem');
+      const permanentDeleteItem = document.getElementById('permanentDeleteItem');
+      const restoreItem = document.getElementById('restoreItem');
+      
+      // Reset visibility
+      favoriteItem.style.display = 'flex';
+      deleteItem.style.display = 'flex';
+      permanentDeleteItem.style.display = 'none';
+      restoreItem.style.display = 'none';
+      
+      if (currentSection === 'trash') {
+        favoriteItem.style.display = 'none';
+        deleteItem.style.display = 'none';
+        permanentDeleteItem.style.display = 'flex';
+        restoreItem.style.display = 'flex';
+      } else if (mediaItem.favorite) {
+        favoriteItem.innerHTML = '<i class="fas fa-heart"></i><span>Remover dos favoritos</span>';
+      } else {
+        favoriteItem.innerHTML = '<i class="far fa-heart"></i><span>Favoritar</span>';
+      }
+      
+      // Store selected media for menu actions
+      contextMenu.dataset.mediaId = mediaId;
+    }
+    
+    // Hide context menu
+    function hideContextMenu() {
+      document.getElementById('contextMenu').style.display = 'none';
+    }
+    
+    // Toggle favorite
+    function toggleFavorite() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Find media in gallery or screenshots
+      const mediaItem = media.gallery.find(p => p.id === mediaId) || 
+                       media.screenshots.find(p => p.id === mediaId);
+      
+      if (mediaItem) {
+        mediaItem.favorite = !mediaItem.favorite;
+        
+        // Update favorites array
+        if (mediaItem.favorite) {
+          if (!media.favorites.some(p => p.id === mediaId)) {
+            media.favorites.push({...mediaItem});
+          }
+        } else {
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Delete media
+    function deleteMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Move media to trash
+      const mediaIndex = media[currentSection].findIndex(p => p.id === mediaId);
+      if (mediaIndex !== -1) {
+        const item = media[currentSection].splice(mediaIndex, 1)[0];
+        media.trash.push(item);
+        
+        // Remove from favorites if it was there
+        media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Permanent delete media
+    function permanentDeleteMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Remove media permanently
+      media.trash = media.trash.filter(p => p.id !== mediaId);
+      
+      saveMediaToStorage();
+      renderMedia();
+      
+      hideContextMenu();
+    }
+    
+    // Restore media
+    function restoreMedia() {
+      const contextMenu = document.getElementById('contextMenu');
+      const mediaId = parseFloat(contextMenu.dataset.mediaId);
+      
+      // Find media in trash
+      const mediaIndex = media.trash.findIndex(p => p.id === mediaId);
+      if (mediaIndex !== -1) {
+        const item = media.trash.splice(mediaIndex, 1)[0];
+        
+        // Restore to original section
+        if (item.type === 'screenshot') {
+          media.screenshots.push(item);
+        } else {
+          media.gallery.push(item);
+        }
+        
+        // Restore to favorites if it was there
+        if (item.favorite) {
+          media.favorites.push({...item});
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+      
+      hideContextMenu();
+    }
+    
+    // Empty trash
+    function emptyTrash() {
+      if (confirm('Tem certeza de que deseja esvaziar a lixeira permanentemente?')) {
+        media.trash = [];
+        saveMediaToStorage();
+        renderMedia();
+      }
+    }
+    
+    // Open viewer
+    function openViewer(mediaItem) {
+      const viewer = document.getElementById('fullscreenViewer');
+      const viewerImage = document.getElementById('viewerImage');
+      
+      viewerImage.src = mediaItem.src;
+      viewerImage.alt = mediaItem.name;
+      viewer.dataset.mediaId = mediaItem.id;
+      
+      // Update favorite button
+      const favoriteBtn = document.getElementById('viewerFavorite');
+      if (mediaItem.favorite) {
+        favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+      } else {
+        favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+      }
+      
+      viewer.classList.add('active');
+    }
+    
+    // Close viewer
+    function closeViewer() {
+      document.getElementById('fullscreenViewer').classList.remove('active');
+    }
+    
+    // Toggle favorite in viewer
+    function toggleFavoriteInViewer() {
+      const viewer = document.getElementById('fullscreenViewer');
+      const mediaId = parseFloat(viewer.dataset.mediaId);
+      
+      // Find media in gallery or screenshots
+      const mediaItem = media.gallery.find(p => p.id === mediaId) || 
+                       media.screenshots.find(p => p.id === mediaId);
+      
+      if (mediaItem) {
+        mediaItem.favorite = !mediaItem.favorite;
+        
+        // Update favorites array
+        if (mediaItem.favorite) {
+          if (!media.favorites.some(p => p.id === mediaId)) {
+            media.favorites.push({...mediaItem});
+          }
+        } else {
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+        
+        // Update favorite button
+        const favoriteBtn = document.getElementById('viewerFavorite');
+        if (mediaItem.favorite) {
+          favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+          favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+        }
+        
+        saveMediaToStorage();
+        renderMedia();
+      }
+    }
+    
+    // Delete media in viewer
+    function deleteMediaInViewer() {
+      const viewer = document.getElementById('fullscreenViewer');
+      const mediaId = parseFloat(viewer.dataset.mediaId);
+      
+      if (currentSection === 'trash') {
+        // Permanent delete
+        media.trash = media.trash.filter(p => p.id !== mediaId);
+      } else {
+        // Move to trash
+        const mediaIndex = media[currentSection].findIndex(p => p.id === mediaId);
+        if (mediaIndex !== -1) {
+          const item = media[currentSection].splice(mediaIndex, 1)[0];
+          media.trash.push(item);
+          
+          // Remove from favorites if it was there
+          media.favorites = media.favorites.filter(p => p.id !== mediaId);
+        }
+      }
+      
+      saveMediaToStorage();
+      renderMedia();
+      closeViewer();
+    }
+    
+    // Simulate updating stats
+    function updateStats() {
+      // Update header stats
+      const headerCpu = document.getElementById('headerCpu');
+      if (headerCpu) {
+        const currentCpu = parseFloat(headerCpu.textContent);
+        const newCpu = Math.max(0, Math.min(100, currentCpu + (Math.random() * 4 - 2)));
+        headerCpu.textContent = `${newCpu.toFixed(0)}%`;
+      }
+      
+      const headerMem = document.getElementById('headerMem');
+      if (headerMem) {
+        const currentMem = parseFloat(headerMem.textContent);
+        const newMem = Math.max(0, Math.min(100, currentMem + (Math.random() * 4 - 2)));
+        headerMem.textContent = `${newMem.toFixed(0)}%`;
+      }
+      
+      const headerGpu = document.getElementById('headerGpu');
+      if (headerGpu) {
+        const currentGpu = parseFloat(headerGpu.textContent);
+        const newGpu = Math.max(0, Math.min(100, currentGpu + (Math.random() * 4 - 2)));
+        headerGpu.textContent = `${newGpu.toFixed(0)}%`;
+      }
+    }
+    
+    // Update stats every 3 seconds
+    setInterval(updateStats, 3000);
+  </script>
+</body>
+</html>
